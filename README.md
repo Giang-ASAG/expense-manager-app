@@ -37,7 +37,7 @@ financial behavior through clear and structured data visualization.
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
+git clone
 cd your-repo
 flutter pub get
 flutter run
