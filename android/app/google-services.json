@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "811110866452",
+    "firebase_url": "https://expense-manager-app-ee34b-default-rtdb.firebaseio.com",
+    "project_id": "expense-manager-app-ee34b",
+    "storage_bucket": "expense-manager-app-ee34b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811110866452:android:7b0463c50f97d017c61101",
+        "android_client_info": {
+          "package_name": "com.giang.expensemanager.expense_manager_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "811110866452-77j52kt59h9tg137mj449k68cq3j8kkr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.giang.expensemanager.expense_manager_app",
+            "certificate_hash": "16f975b0170c3bffe51dc0ff76931bfb411e5be0"
+          }
+        },
+        {
+          "client_id": "811110866452-kso99eq4ohltu6a2i378n2tfafs6gis5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpowQyfqJHcNgGng0Fm70f2TrlSjPFwCY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "811110866452-kso99eq4ohltu6a2i378n2tfafs6gis5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
