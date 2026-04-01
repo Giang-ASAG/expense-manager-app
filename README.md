@@ -38,7 +38,6 @@ financial behavior through clear and structured data visualization.
 
 ```bash
 git clone
-cd your-repo
 flutter pub get
 flutter run
 ```
