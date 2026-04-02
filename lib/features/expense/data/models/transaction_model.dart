@@ -10,6 +10,7 @@ class TransactionModel {
   final String? toWalletId; // chỉ dùng cho transfer
   final String date;
   final int createdAt;
+  final String? imageUrl; // <--- Thêm trường này để lưu link ảnh
 
   TransactionModel({
     required this.id,
@@ -21,6 +22,7 @@ class TransactionModel {
     this.toWalletId,
     required this.date,
     required this.createdAt,
+    this.imageUrl, // <--- Thêm vào constructor (để optional vì không phải giao dịch nào cũng có ảnh)
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +35,7 @@ class TransactionModel {
       'toWalletId': toWalletId,
       'date': date,
       'createdAt': createdAt,
+      'imageUrl': imageUrl, // <--- Đưa vào map để đẩy lên database
     };
   }
 
@@ -47,6 +50,7 @@ class TransactionModel {
       toWalletId: map['toWalletId'],
       date: map['date'] ?? '',
       createdAt: map['createdAt'] ?? 0,
+      imageUrl: map['imageUrl'], // <--- Đọc link ảnh từ database về
     );
   }
 }

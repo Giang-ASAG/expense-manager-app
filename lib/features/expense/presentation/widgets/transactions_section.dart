@@ -11,7 +11,7 @@ class TransactionsSection extends StatelessWidget {
     this.onSeeAll,
   });
 
-  final Stream<List<TransactionModel>> transactions;
+  final List<TransactionModel> transactions; // ✅ Đổi từ Stream → List
   final VoidCallback? onSeeAll;
 
   @override
@@ -22,38 +22,27 @@ class TransactionsSection extends StatelessWidget {
         children: [
           _buildHeader(),
           const SizedBox(height: 14),
-          StreamBuilder<List<TransactionModel>>(
-            stream: transactions,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return const Text('Không thể tải giao dịch');
-              }
-
-              final items = snapshot.data ?? [];
-              if (items.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(
-                    child: Text(
-                      'Chưa có giao dịch nào',
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
-                  ),
-                );
-              }
-
-              return Column(
-                children: items.map((tx) => TransactionItem(tx: tx)).toList(),
-              );
-            },
-          ),
+          // ✅ Xoá StreamBuilder, dùng trực tiếp
+          if (transactions.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(
+                child: Text(
+                  'Chưa có giao dịch nào',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ),
+            )
+          else
+            Column(
+              children: transactions.map((tx) => TransactionItem(tx: tx)).toList(),
+            ),
         ],
       ),
     );
   }
+
+  // ... _buildHeader() và TransactionItem giữ nguyên
 
   Widget _buildHeader() {
     return Row(

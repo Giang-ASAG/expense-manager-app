@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('user_uid', uid);
-
+        await prefs.setBool('is_logged_in', true);
         await RTDBService().initUserData(uid);
 
         if (!mounted) return;

@@ -3,7 +3,7 @@ import 'package:expense_manager_app/core/style/app_colors.dart';
 import '../../../../core/style/app_text_styles.dart';
 
 class SpendingChartSection extends StatelessWidget {
-  const SpendingChartSection({
+  SpendingChartSection({
     super.key,
     this.weekData = const [0.4, 0.7, 0.5, 0.9, 0.3, 0.6, 0.8],
     this.totalSpent = 1840000,
@@ -13,7 +13,7 @@ class SpendingChartSection extends StatelessWidget {
   final List<double> weekData;
   final double totalSpent;
 
-  static const _days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  late final days = _getLast7Days();
 
   String _formatVND(double amount) {
     return amount
@@ -24,7 +24,17 @@ class SpendingChartSection extends StatelessWidget {
     ) +
         ' đ';
   }
+  List<String> _getLast7Days() {
+    final now = DateTime.now();
+    return List.generate(7, (index) {
+      final date = now.subtract(Duration(days: 6 - index));
 
+      // Nếu là hôm nay
+      if (index == 6) return 'Nay';
+
+      return '${date.day}/${date.month}';
+    });
+  }
   @override
   Widget build(BuildContext context) {
     assert(weekData.length == 7, 'weekData phải có đúng 7 phần tử');
@@ -86,6 +96,8 @@ class SpendingChartSection extends StatelessWidget {
   }
 
   Widget _buildBars() {
+    final days = _getLast7Days(); // ✅ đặt ở đây
+
     return SizedBox(
       height: 90,
       child: Row(
@@ -111,7 +123,7 @@ class SpendingChartSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _days[i],
+                    days[i], // ✅ dùng đúng
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight:

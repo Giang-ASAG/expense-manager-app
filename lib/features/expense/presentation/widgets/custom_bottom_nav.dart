@@ -17,7 +17,7 @@ class CustomBottomNav extends StatelessWidget {
   static const _items = [
     _NavItem(icon: Icons.home_rounded, label: 'Tổng quan'),
     _NavItem(icon: Icons.receipt_long_outlined, label: 'Lịch sử'),
-    _NavItem(icon: Icons.bar_chart_rounded, label: 'Thống kê'),
+    _NavItem(icon: Icons.image_outlined, label: 'Hình ảnh'),
     _NavItem(icon: Icons.person_outline_rounded, label: 'Cài đặt'),
   ];
 

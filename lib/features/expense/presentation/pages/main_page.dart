@@ -1,4 +1,5 @@
 import 'package:expense_manager_app/features/expense/presentation/pages/add_transaction_page.dart';
+import 'package:expense_manager_app/features/expense/presentation/pages/expense_gallery_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/overview_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/settings_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/transaction_history_page.dart';
@@ -19,10 +20,14 @@ class _MainPageState extends State<MainPage> {
 
   // Dùng getter vì cần widget.user
   List<Widget> get _pages => [
-    OverviewPage(user: widget.user), // index 0
-    const TransactionHistoryPage(), // index 1
-    const SizedBox.shrink(), // index 2 - placeholder notifications
-    const SettingsPage(), // index 3 - placeholder settings
+    OverviewPage(user: widget.user),
+    // index 0
+    TransactionHistoryPage(id: widget.user!.uid),
+    // index 1
+    ExpenseGalleryPage(id: widget.user!.uid),
+    // index 2 - placeholder notifications
+    const SettingsPage(),
+    // index 3 - placeholder settings
   ];
 
   @override
