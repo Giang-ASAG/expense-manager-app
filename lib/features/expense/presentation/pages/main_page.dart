@@ -26,7 +26,7 @@ class _MainPageState extends State<MainPage> {
     // index 1
     ExpenseGalleryPage(id: widget.user!.uid),
     // index 2 - placeholder notifications
-    const SettingsPage(),
+    SettingsPage(user: widget.user),
     // index 3 - placeholder settings
   ];
 

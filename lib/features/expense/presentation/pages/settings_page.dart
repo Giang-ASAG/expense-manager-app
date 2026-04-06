@@ -1,10 +1,13 @@
 import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, required this.user});
+
+  final User? user;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -13,6 +16,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _isDarkMode = false;
   bool _isLoggingOut = false;
+  late final User? user = widget.user;
 
   // ─── Actions ────────────────────────────────────────────────────────────────
 
@@ -28,39 +32,50 @@ class _SettingsPageState extends State<SettingsPage> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginPage()),
-          (_) => false,
+      (_) => false,
     );
   }
 
   Future<bool> _showLogoutDialog() async {
     return await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: AppColors.surface,
-        title: const Text(
-          'Đăng xuất?',
-          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-        ),
-        content: const Text(
-          'Bạn có chắc muốn đăng xuất khỏi tài khoản không?',
-          style: TextStyle(color: AppColors.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Huỷ', style: TextStyle(color: AppColors.textSecondary)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Đăng xuất',
-              style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.bold),
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
             ),
+            backgroundColor: AppColors.surface,
+            title: const Text(
+              'Đăng xuất?',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            content: const Text(
+              'Bạn có chắc muốn đăng xuất khỏi tài khoản không?',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text(
+                  'Huỷ',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text(
+                  'Đăng xuất',
+                  style: TextStyle(
+                    color: AppColors.danger,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ) ??
+        ) ??
         false;
   }
 
@@ -71,7 +86,9 @@ class _SettingsPageState extends State<SettingsPage> {
         SnackBar(
           content: Text('$feature sẽ sớm ra mắt! 🚀'),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         ),
       );
@@ -178,7 +195,10 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primary.withOpacity(0.15), AppColors.primary.withOpacity(0.04)],
+          colors: [
+            AppColors.primary.withOpacity(0.15),
+            AppColors.primary.withOpacity(0.04),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -190,7 +210,11 @@ class _SettingsPageState extends State<SettingsPage> {
           CircleAvatar(
             radius: 28,
             backgroundColor: AppColors.primary.withOpacity(0.2),
-            child: const Icon(Icons.person_rounded, color: AppColors.primary, size: 28),
+            child: const Icon(
+              Icons.person_rounded,
+              color: AppColors.primary,
+              size: 28,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -198,12 +222,15 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Xin chào 👋',
-                  style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                  'Xin chào',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 2),
-                const Text(
-                  'Người dùng',
+                Text(
+                  user!.displayName!,
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
@@ -233,7 +260,10 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSection({required String title, required List<_SettingItem> items}) {
+  Widget _buildSection({
+    required String title,
+    required List<_SettingItem> items,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -271,7 +301,10 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         ListTile(
           onTap: item.onTap,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 4,
+          ),
           leading: Container(
             width: 40,
             height: 40,
@@ -294,7 +327,10 @@ class _SettingsPageState extends State<SettingsPage> {
               if (item.badge != null) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.orange,
                     borderRadius: BorderRadius.circular(6),
@@ -314,16 +350,24 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           subtitle: item.subtitle != null
               ? Padding(
-            padding: const EdgeInsets.only(top: 2),
-            child: Text(
-              item.subtitle!,
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-          )
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    item.subtitle!,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                )
               : null,
-          trailing: item.trailing ??
+          trailing:
+              item.trailing ??
               (item.onTap != null
-                  ? const Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 20)
+                  ? const Icon(
+                      Icons.chevron_right,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    )
                   : null),
         ),
         if (showDivider)
@@ -344,10 +388,13 @@ class _SettingsPageState extends State<SettingsPage> {
         onPressed: _isLoggingOut ? null : _handleLogout,
         icon: _isLoggingOut
             ? const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.danger),
-        )
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.danger,
+                ),
+              )
             : const Icon(Icons.logout_rounded, size: 20),
         label: Text(_isLoggingOut ? 'Đang đăng xuất...' : 'Đăng xuất'),
         style: FilledButton.styleFrom(
@@ -357,7 +404,9 @@ class _SettingsPageState extends State<SettingsPage> {
           disabledForegroundColor: AppColors.danger.withOpacity(0.5),
           padding: const EdgeInsets.symmetric(vertical: 16),
           textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           elevation: 0,
         ),
       ),

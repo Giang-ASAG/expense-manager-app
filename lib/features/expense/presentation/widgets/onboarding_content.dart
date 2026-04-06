@@ -17,8 +17,16 @@ class OnboardingContent extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Thay Icon bằng Image.asset(imagePath) khi bạn có ảnh thực tế
-        Icon(Icons.image, size: 200, color: Colors.blueAccent),
+        Image.asset(
+          imagePath, // Biến này phải khớp với 'assets/images/logo_app.png'
+          width: 300,
+          height: 300,
+          fit: BoxFit.contain,
+          // Thêm cái này để debug: nếu lỗi nó sẽ hiện icon báo lỗi
+          errorBuilder: (context, error, stackTrace) {
+            return const Icon(Icons.error, color: Colors.red, size: 100);
+          },
+        ),
         const SizedBox(height: 40),
         Text(
           title,

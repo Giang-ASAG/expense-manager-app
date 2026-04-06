@@ -28,7 +28,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     OnboardingEntity(
       title: 'Phân Tích Thông Minh',
       description:
-          'Xem biểu đồ trực quan để hiểu rõ thói quen tiêu dùng của bản thân.',
+          'Xem lịch sử để hiểu rõ thói quen tiêu dùng của bản thân.',
       imagePath: 'assets/images/onboarding2.png',
     ),
     OnboardingEntity(
@@ -47,20 +47,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   void _onNext() async {
     if (_currentPage == _onboardingData.length - 1) {
-      // Đã ở trang cuối -> Chuyển sang màn hình Login hoặc Home
-      // Navigator.pushReplacementNamed(context, '/home');
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('is_first_time', false);
+
+      if (!mounted) return; // Thêm kiểm tra mounted để tránh lỗi nếu người dùng thoát app nhanh
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
-      print("Chuyển sang màn hình chính!");
     } else {
-      // Chuyển sang trang tiếp theo
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn,
+        duration: const Duration(milliseconds: 400), // Tăng lên 400ms cho mượt
+        curve: Curves.easeInOut, // Hiệu ứng mượt hơn easeIn
       );
     }
   }
@@ -107,18 +106,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  // Phương thức _buildDot đã được thêm lại
   Widget _buildDot(int index) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.only(right: 8),
-      height: 4,
-      width: _currentPage == index ? 18 : 18,
+      height: 6, // Tăng độ dày một chút cho dễ nhìn
+      width: _currentPage == index ? 24 : 8, // Hiệu ứng thanh dài thanh ngắn
       decoration: BoxDecoration(
         color: _currentPage == index
             ? const Color(0xFF2D4BFF)
             : const Color(0xFFE8E9EA),
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(3),
       ),
     );
   }

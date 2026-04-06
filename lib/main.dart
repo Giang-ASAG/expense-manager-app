@@ -1,3 +1,4 @@
+import 'package:expense_manager_app/core/database/database_helper.dart';
 import 'package:expense_manager_app/core/services/notification_service.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/login_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/main_page.dart';
@@ -14,6 +15,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // TODO: Khởi tạo Firebase
   await Firebase.initializeApp();
+  // --- THÊM DÒNG NÀY ---
+  // Khởi tạo DatabaseHelper và gọi getter database để nó chạy hàm copy
+  final dbHelper = DatabaseHelper();
+  await dbHelper.database;
   await initializeDateFormatting('vi', null);
   await NotificationService.init();
   await NotificationService.scheduleDailyReminder();
@@ -23,7 +28,8 @@ Future<void> main() async {
   // Nếu chưa từng lưu 'is_first_time', mặc định nó sẽ là true (lần đầu)
   final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
   runApp(
-    ProviderScope( // ✅ thêm vào đây
+    ProviderScope(
+      // ✅ thêm vào đây
       child: MyApp(isFirstTime: isFirstTime),
     ),
   );

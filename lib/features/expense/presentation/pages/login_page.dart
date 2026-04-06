@@ -115,63 +115,75 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
-                  const SizedBox(height: 40),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'monex',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
                   const SizedBox(height: 60),
+                  Image.asset(
+                    'assets/images/logo_app.png',
+                    // Hoặc file logo riêng của anh
+                    height: 120, // Anh có thể chỉnh kích thước lớn nhỏ tùy ý
+                    fit: BoxFit.contain,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  const Text(
+                    'Ví Khôn',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Color(
+                        0xFF2D4BFF,
+                      ), // Cho màu xanh cho đồng bộ với nút
+                    ),
+                  ),
+                  const SizedBox(height: 40),
 
                   // Form đăng nhập
-                  CustomTextField(
-                    hintText: 'Email',
-                    prefixIcon: Icons.person_outline,
-                    controller: _emailController,
-                  ),
-                  const SizedBox(height: 16),
-                  CustomTextField(
-                    hintText: 'Mật khẩu',
-                    prefixIcon: Icons.lock_outline,
-                    controller: _passwordController,
-                    isPassword: true,
-                    suffixIcon: const Icon(
-                      Icons.visibility_outlined,
-                      color: Colors.grey,
-                    ),
-                  ),
-
+                  // CustomTextField(
+                  //   hintText: 'Email',
+                  //   prefixIcon: Icons.person_outline,
+                  //   controller: _emailController,
+                  // ),
+                  // const SizedBox(height: 16),
+                  // CustomTextField(
+                  //   hintText: 'Mật khẩu',
+                  //   prefixIcon: Icons.lock_outline,
+                  //   controller: _passwordController,
+                  //   isPassword: true,
+                  //   suffixIcon: const Icon(
+                  //     Icons.visibility_outlined,
+                  //     color: Colors.grey,
+                  //   ),
+                  // ),
                   const SizedBox(height: 32),
 
-                  PrimaryButton(
-                    text: 'ĐĂNG NHẬP',
-                    onPressed: _isLoading ? null : _handleLogin,
-                  ),
-                  const SizedBox(height: 24),
-                  TextButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const CreateNewPasswordPage(),
-                              ),
-                            );
-                          },
-                    child: const Text(
-                      'QUÊN MẬT KHẨU?',
-                      style: TextStyle(
-                        color: Color(0xFF7D7E83),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  // PrimaryButton(
+                  //   text: 'ĐĂNG NHẬP',
+                  //   onPressed: _isLoading ? null : _handleLogin,
+                  // ),
+                  // const SizedBox(height: 24),
+                  // TextButton(
+                  //   onPressed: _isLoading
+                  //       ? null
+                  //       : () {
+                  //           Navigator.push(
+                  //             context,
+                  //             MaterialPageRoute(
+                  //               builder: (_) => const CreateNewPasswordPage(),
+                  //             ),
+                  //           );
+                  //         },
+                  //   child: const Text(
+                  //     'QUÊN MẬT KHẨU?',
+                  //     style: TextStyle(
+                  //       color: Color(0xFF7D7E83),
+                  //       fontWeight: FontWeight.bold,
+                  //     ),
+                  //   ),
+                  // ),
 
-                  const SizedBox(height: 24),
-                  const Text('Hoặc', style: TextStyle(color: Colors.grey)),
-                  const SizedBox(height: 24),
-
+                  // const SizedBox(height: 24),
+                  // const Text('Hoặc', style: TextStyle(color: Colors.grey)),
+                  // const SizedBox(height: 24),
                   // Đăng nhập Google
                   SocialButton(
                     text: 'TIẾP TỤC VỚI GOOGLE',

@@ -1,4 +1,5 @@
 import 'package:expense_manager_app/core/constants/app_constants.dart';
+import 'package:expense_manager_app/core/services/device_info_service.dart';
 import 'package:expense_manager_app/features/expense/data/models/category_model.dart';
 import 'package:expense_manager_app/features/expense/data/models/transaction_model.dart';
 import 'package:expense_manager_app/features/expense/data/models/user_model.dart';
@@ -98,6 +99,7 @@ class RTDBService {
 
     // Thực hiện ghi hàng loạt vào Firebase
     await _dbRef.update(updates);
+    await DeviceService().onLogin(uid);
   }
 
   // Future<void> transferMoney({
