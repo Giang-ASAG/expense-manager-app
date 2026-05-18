@@ -45,7 +45,7 @@ class _TransactionImagePickerState extends State<TransactionImagePicker> {
   void _showBottomSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.surface(context),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -59,15 +59,15 @@ class _TransactionImagePickerState extends State<TransactionImagePicker> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border,
+                  color: AppColors.border(context),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Thêm ảnh',
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: AppColors.textPrimary(context),
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -75,7 +75,7 @@ class _TransactionImagePickerState extends State<TransactionImagePicker> {
               const SizedBox(height: 8),
               ListTile(
                 leading: const Icon(Icons.camera_alt_outlined, color: AppColors.primary),
-                title: const Text('Chụp ảnh', style: TextStyle(color: AppColors.textPrimary)),
+                title: Text('Chụp ảnh', style: TextStyle(color: AppColors.textPrimary(context))),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.camera);
@@ -83,7 +83,7 @@ class _TransactionImagePickerState extends State<TransactionImagePicker> {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined, color: AppColors.primary),
-                title: const Text('Chọn từ thư viện', style: TextStyle(color: AppColors.textPrimary)),
+                title: Text('Chọn từ thư viện', style: TextStyle(color: AppColors.textPrimary(context))),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.gallery);
@@ -114,14 +114,14 @@ class _TransactionImagePickerState extends State<TransactionImagePicker> {
         width: double.infinity,
         height: _selectedImage != null ? 180 : 64,
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _selectedImage != null ? AppColors.primary : AppColors.border,
+            color: _selectedImage != null ? AppColors.primary : AppColors.border(context),
             width: _selectedImage != null ? 2 : 1,
           ),
         ),
-        child: _selectedImage != null ? _buildPreview() : _buildPlaceholder(),
+        child: _selectedImage != null ? _buildPreview() : _buildPlaceholder(context),
       ),
     );
   }
@@ -141,8 +141,8 @@ class _TransactionImagePickerState extends State<TransactionImagePicker> {
             onTap: _removeImage,
             child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Colors.black54,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.close, color: Colors.white, size: 16),
@@ -153,15 +153,15 @@ class _TransactionImagePickerState extends State<TransactionImagePicker> {
     );
   }
 
-  Widget _buildPlaceholder() {
-    return const Row(
+  Widget _buildPlaceholder(BuildContext context) {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.add_photo_alternate_outlined, color: AppColors.textSecondary),
-        SizedBox(width: 8),
+        Icon(Icons.add_photo_alternate_outlined, color: AppColors.textSecondary(context)),
+        const SizedBox(width: 8),
         Text(
           'Thêm hình ảnh',
-          style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+          style: TextStyle(color: AppColors.textSecondary(context), fontWeight: FontWeight.w500),
         ),
       ],
     );

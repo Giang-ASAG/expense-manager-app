@@ -22,14 +22,18 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
     // ✅ Riverpod thay StreamBuilder
     final imagesAsync = ref.watch(expenseImagesProvider(widget.id));
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
-        title: const Text(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppColors.textPrimary(context)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
           'Hình ảnh',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimary(context),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -37,13 +41,13 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
       ),
       body: imagesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => _buildEmptyState(isError: true),
+        error: (_, __) => _buildEmptyState(context, isError: true),
         data: (expenseImages) {
-          if (expenseImages.isEmpty) return _buildEmptyState();
+          if (expenseImages.isEmpty) return _buildEmptyState(context);
           return Column(
             children: [
-              _buildSummaryBar(expenseImages.length),
-              Expanded(child: _buildGrid(expenseImages)),
+              _buildSummaryBar(expenseImages.length, context),
+              Expanded(child: _buildGrid(expenseImages, context)),
             ],
           );
         },
@@ -51,14 +55,14 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
     );
   }
 
-  Widget _buildSummaryBar(int count) {
+  Widget _buildSummaryBar(int count, BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: Row(
         children: [
@@ -70,8 +74,8 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
           const SizedBox(width: 8),
           Text(
             '$count hình ảnh',
-            style: const TextStyle(
-              color: AppColors.textPrimary,
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -79,14 +83,14 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
           const Spacer(),
           Text(
             'Nhấn để xem chi tiết',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+            style: TextStyle(color: AppColors.textSecondary(context), fontSize: 12),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildGrid(List<TransactionModel> items) {
+  Widget _buildGrid(List<TransactionModel> items, BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -95,13 +99,13 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
         mainAxisSpacing: 6,
       ),
       itemCount: items.length,
-      itemBuilder: (context, index) => _buildImageItem(items[index]),
+      itemBuilder: (context, index) => _buildImageItem(items[index], context),
     );
   }
 
-  Widget _buildImageItem(TransactionModel transaction) {
+  Widget _buildImageItem(TransactionModel transaction, BuildContext context) {
     return GestureDetector(
-      onTap: () => _showImageDetail(transaction),
+      onTap: () => _showImageDetail(transaction, context),
       child: Hero(
         tag: transaction.id,
         child: ClipRRect(
@@ -115,17 +119,17 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
                 loadingBuilder: (_, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Container(
-                    color: AppColors.border,
+                    color: AppColors.border(context),
                     child: const Center(
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                   );
                 },
                 errorBuilder: (_, __, ___) => Container(
-                  color: AppColors.border,
-                  child: const Icon(
+                  color: AppColors.border(context),
+                  child: Icon(
                     Icons.broken_image_outlined,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                   ),
                 ),
               ),
@@ -163,7 +167,7 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
     );
   }
 
-  void _showImageDetail(TransactionModel transaction) {
+  void _showImageDetail(TransactionModel transaction, BuildContext context) {
     final date = DateTime.fromMillisecondsSinceEpoch(transaction.createdAt);
     final dateStr = DateFormat('dd/MM/yyyy – HH:mm').format(date);
 
@@ -172,83 +176,123 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Hero(
-              tag: transaction.id,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                child: Image.network(
-                  transaction.imageUrl!,
-                  fit: BoxFit.contain,
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Ảnh với tỉ lệ 4:3
+                Container(
                   width: double.infinity,
-                ),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    transaction.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17,
-                      color: Colors.black87,
-                    ),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width - 32,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
+                  child: AspectRatio(
+                    aspectRatio: 4 / 3,
+                    child: Hero(
+                      tag: transaction.id,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20),
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.red.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '${_formatter.format(transaction.amount)}₫',
-                          style: TextStyle(
-                            color: Colors.red.shade600,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                        child: Image.network(
+                          transaction.imageUrl!,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (_, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              color: AppColors.border(context),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (_, __, ___) => Container(
+                            color: AppColors.border(context),
+                            child: Icon(
+                              Icons.broken_image_outlined,
+                              color: AppColors.textSecondary(context),
+                            ),
                           ),
                         ),
                       ),
-                      const Spacer(),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width - 32,
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface(context),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text(
-                        dateStr,
-                        style: const TextStyle(
-                          color: Colors.black45,
-                          fontSize: 12,
+                        transaction.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                          color: AppColors.textPrimary(context),
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.danger.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${_formatter.format(transaction.amount)}₫',
+                              style: const TextStyle(
+                                color: AppColors.danger,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              dateStr,
+                              style: TextStyle(
+                                color: AppColors.textSecondary(context),
+                                fontSize: 12,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState({bool isError = false}) {
+  Widget _buildEmptyState(BuildContext context, {bool isError = false}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -256,22 +300,22 @@ class _ExpenseGalleryPageState extends ConsumerState<ExpenseGalleryPage> {
           Icon(
             isError ? Icons.error_outline : Icons.photo_library_outlined,
             size: 64,
-            color: AppColors.textSecondary,
+            color: AppColors.textSecondary(context),
           ),
           const SizedBox(height: 16),
           Text(
             isError ? 'Đã có lỗi xảy ra' : 'Chưa có hoá đơn nào',
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 8),
           if (!isError)
-            const Text(
+            Text(
               'Thêm ảnh khi tạo giao dịch để lưu hoá đơn',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13),
               textAlign: TextAlign.center,
             ),
         ],

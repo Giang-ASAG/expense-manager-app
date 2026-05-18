@@ -128,8 +128,8 @@ class _AddCategoryPageState extends State<AddCategoryPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      backgroundColor: AppColors.background(context),
+      appBar: _buildAppBar(context),
       body: Column(
         children: [
           Expanded(
@@ -138,19 +138,19 @@ class _AddCategoryPageState extends State<AddCategoryPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTypeToggle(),
+                  _buildTypeToggle(context),
                   const SizedBox(height: 24),
-                  _buildPreviewCard(),
+                  _buildPreviewCard(context),
                   const SizedBox(height: 24),
-                  _buildNameInput(),
+                  _buildNameInput(context),
                   const SizedBox(height: 16),
-                  _buildSelectionContainer(),
+                  _buildSelectionContainer(context),
                   const SizedBox(height: 8),
                 ],
               ),
             ),
           ),
-          _buildBottomButtons(),
+          _buildBottomButtons(context),
         ],
       ),
     );
@@ -158,18 +158,19 @@ class _AddCategoryPageState extends State<AddCategoryPage>
 
   // ── App Bar ──────────────────────────────────────────────────────────────
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       elevation: 0,
       leading: _circleButton(
         icon: Icons.close,
         onTap: () => Navigator.pop(context),
+        context: context,
       ),
-      title: const Text(
+      title: Text(
         'Tạo Danh mục',
         style: TextStyle(
-          color: AppColors.textPrimary,
+          color: AppColors.textPrimary(context),
           fontWeight: FontWeight.w700,
           fontSize: 18,
           letterSpacing: -0.3,
@@ -179,18 +180,18 @@ class _AddCategoryPageState extends State<AddCategoryPage>
     );
   }
 
-  Widget _circleButton({required IconData icon, required VoidCallback onTap}) {
+  Widget _circleButton({required IconData icon, required VoidCallback onTap, required BuildContext context}) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: AppColors.surface(context),
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: AppColors.border(context)),
           ),
-          child: Icon(icon, color: AppColors.textPrimary, size: 20),
+          child: Icon(icon, color: AppColors.textPrimary(context), size: 20),
         ),
       ),
     );
@@ -198,23 +199,23 @@ class _AddCategoryPageState extends State<AddCategoryPage>
 
   // ── Type Toggle ──────────────────────────────────────────────────────────
 
-  Widget _buildTypeToggle() {
+  Widget _buildTypeToggle(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.border.withOpacity(0.4),
+        color: AppColors.border(context).withOpacity(0.4),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          _toggleItem('Chi phí', isExpense, AppColors.danger),
-          _toggleItem('Thu nhập', !isExpense, AppColors.success),
+          _toggleItem('Chi phí', isExpense, AppColors.danger, context),
+          _toggleItem('Thu nhập', !isExpense, AppColors.success, context),
         ],
       ),
     );
   }
 
-  Widget _toggleItem(String label, bool isActive, Color activeColor) {
+  Widget _toggleItem(String label, bool isActive, Color activeColor, BuildContext context) {
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => isExpense = (label == 'Chi phí')),
@@ -239,7 +240,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
             child: Text(
               label,
               style: TextStyle(
-                color: isActive ? Colors.white : AppColors.textSecondary,
+                color: isActive ? Colors.white : AppColors.textSecondary(context),
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
               ),
@@ -252,7 +253,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
 
   // ── Live Preview Card ────────────────────────────────────────────────────
 
-  Widget _buildPreviewCard() {
+  Widget _buildPreviewCard(BuildContext context) {
     final displayName = _nameController.text.trim().isEmpty
         ? 'Tên danh mục'
         : _nameController.text.trim();
@@ -264,7 +265,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
         width: double.infinity,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: accentColor.withOpacity(0.3), width: 1.5),
           boxShadow: [
@@ -308,8 +309,8 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
                       color: _nameController.text.trim().isEmpty
-                          ? AppColors.textSecondary
-                          : AppColors.textPrimary,
+                          ? AppColors.textSecondary(context)
+                          : AppColors.textPrimary(context),
                       letterSpacing: -0.2,
                     ),
                     child: Text(
@@ -359,8 +360,9 @@ class _AddCategoryPageState extends State<AddCategoryPage>
 
   // ── Name Input ───────────────────────────────────────────────────────────
 
-  Widget _buildNameInput() {
+  Widget _buildNameInput(BuildContext context) {
     return _buildCardWrapper(
+      context: context,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -379,14 +381,14 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                 ),
               ),
               const SizedBox(width: 10),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Tên danh mục',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: AppColors.textPrimary(context),
                       fontSize: 14,
                     ),
                   ),
@@ -394,7 +396,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                     'Tên hiển thị cho danh mục',
                     style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondary(context),
                     ),
                   ),
                 ],
@@ -404,19 +406,19 @@ class _AddCategoryPageState extends State<AddCategoryPage>
           const SizedBox(height: 14),
           TextField(
             controller: _nameController,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 15,
-              color: AppColors.textPrimary,
+              color: AppColors.textPrimary(context),
             ),
             decoration: InputDecoration(
               hintText: 'Nhập tên danh mục...',
-              hintStyle: const TextStyle(
-                color: AppColors.textSecondary,
+              hintStyle: TextStyle(
+                color: AppColors.textSecondary(context),
                 fontWeight: FontWeight.normal,
               ),
               filled: true,
-              fillColor: AppColors.background,
+              fillColor: AppColors.background(context),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 14,
@@ -432,9 +434,9 @@ class _AddCategoryPageState extends State<AddCategoryPage>
               suffixIcon: _nameController.text.isNotEmpty
                   ? GestureDetector(
                       onTap: () => _nameController.clear(),
-                      child: const Icon(
+                      child: Icon(
                         Icons.cancel,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSecondary(context),
                         size: 18,
                       ),
                     )
@@ -448,8 +450,9 @@ class _AddCategoryPageState extends State<AddCategoryPage>
 
   // ── Selection Container ──────────────────────────────────────────────────
 
-  Widget _buildSelectionContainer() {
+  Widget _buildSelectionContainer(BuildContext context) {
     return _buildCardWrapper(
+      context: context,
       child: Column(
         children: [
           // Icon section
@@ -459,6 +462,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
             subtitle: 'Chọn biểu tượng đại diện',
             isExpanded: _isIconExpanded,
             onTap: () => setState(() => _isIconExpanded = !_isIconExpanded),
+            context: context,
           ),
           _buildAnimatedSection(
             isExpanded: _isIconExpanded,
@@ -487,7 +491,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                       decoration: BoxDecoration(
                         color: isSelected
                             ? Color(selectedColor).withOpacity(0.12)
-                            : AppColors.background,
+                            : AppColors.background(context),
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: isSelected
@@ -509,7 +513,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                         item['icon'],
                         color: isSelected
                             ? Color(selectedColor)
-                            : AppColors.textSecondary,
+                            : AppColors.textSecondary(context),
                         size: 22,
                       ),
                     ),
@@ -523,7 +527,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Row(
               children: [
-                Expanded(child: Divider(color: AppColors.border, height: 1)),
+                Expanded(child: Divider(color: AppColors.border(context), height: 1)),
               ],
             ),
           ),
@@ -535,6 +539,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
             subtitle: 'Màu chủ đạo cho danh mục',
             isExpanded: _isColorExpanded,
             onTap: () => setState(() => _isColorExpanded = !_isColorExpanded),
+            context: context,
           ),
           _buildAnimatedSection(
             isExpanded: _isColorExpanded,
@@ -596,14 +601,14 @@ class _AddCategoryPageState extends State<AddCategoryPage>
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
-  Widget _buildCardWrapper({required Widget child}) {
+  Widget _buildCardWrapper({required Widget child, required BuildContext context}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: child,
     );
@@ -615,6 +620,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
     required String subtitle,
     required bool isExpanded,
     required VoidCallback onTap,
+    required BuildContext context,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -636,17 +642,17 @@ class _AddCategoryPageState extends State<AddCategoryPage>
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textPrimary(context),
                     fontSize: 14,
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                   ),
                 ),
               ],
@@ -658,12 +664,12 @@ class _AddCategoryPageState extends State<AddCategoryPage>
             child: Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: AppColors.background(context),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.keyboard_arrow_up,
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondary(context),
                 size: 18,
               ),
             ),
@@ -691,12 +697,12 @@ class _AddCategoryPageState extends State<AddCategoryPage>
 
   // ── Bottom Buttons ───────────────────────────────────────────────────────
 
-  Widget _buildBottomButtons() {
+  Widget _buildBottomButtons(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(top: BorderSide(color: AppColors.border)),
+        color: AppColors.surface(context),
+        border: Border(top: BorderSide(color: AppColors.border(context))),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -715,12 +721,12 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
-                side: const BorderSide(color: AppColors.border, width: 1.5),
+                side: BorderSide(color: AppColors.border(context), width: 1.5),
               ),
-              child: const Text(
+              child: Text(
                 'Hủy',
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: AppColors.textPrimary(context),
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
                 ),
@@ -741,16 +747,16 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                 elevation: 0,
                 shadowColor: Color(selectedColor).withOpacity(0.4),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.check_circle_outline,
                     color: Colors.white,
                     size: 18,
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  SizedBox(width: 8),
+                  Text(
                     'Lưu danh mục',
                     style: TextStyle(
                       color: Colors.white,

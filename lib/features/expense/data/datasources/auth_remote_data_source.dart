@@ -1,39 +1,27 @@
+import 'package:expense_manager_app/core/services/google_signin_service.dart';
 import 'package:expense_manager_app/core/services/rtdb_service.dart';
 import 'package:expense_manager_app/features/expense/data/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRemoteDataSource {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Sửa tên biến từ _firestoreService thành _rtdbService cho đúng bản chất
   final RTDBService _rtdbService = RTDBService();
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null;
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final UserCredential userCredential = await _auth.signInWithCredential(
-        credential,
-      );
+      // Sử dụng service helper
+      final userCredential = await GoogleSignInService.signInWithGoogle();
 
       // Gọi hàm helper để lưu user
-      if (userCredential.user != null) {
+      if (userCredential != null && userCredential.user != null) {
         await _saveUserToRTDB(userCredential.user!);
       }
 
       return userCredential;
     } catch (e) {
+      print('AuthDataSource Google Sign-In Error: $e');
       rethrow;
     }
   }

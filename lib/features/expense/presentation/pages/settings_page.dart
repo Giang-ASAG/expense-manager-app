@@ -2,21 +2,40 @@ import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsPage extends StatefulWidget {
+import '../../../../core/providers/theme_provider.dart';
+
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key, required this.user});
 
   final User? user;
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
-  bool _isDarkMode = false;
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _isLoggingOut = false;
   late final User? user = widget.user;
+  String _appVersion = '...';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) {
+      setState(() {
+        _appVersion = '${info.version}+${info.buildNumber}';
+      });
+    }
+  }
 
   // ─── Actions ────────────────────────────────────────────────────────────────
 
@@ -26,7 +45,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
     setState(() => _isLoggingOut = true);
     final prefs = await SharedPreferences.getInstance();
+    final preservedTheme = prefs.getString('theme_mode');
+    final preservedFirstTime = prefs.getBool('is_first_time');
     await prefs.clear();
+    if (preservedTheme != null) {
+      await prefs.setString('theme_mode', preservedTheme);
+    }
+    if (preservedFirstTime != null) {
+      await prefs.setBool('is_first_time', preservedFirstTime);
+    }
 
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
@@ -43,24 +70,24 @@ class _SettingsPageState extends State<SettingsPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),
-            backgroundColor: AppColors.surface,
-            title: const Text(
+            backgroundColor: AppColors.surface(ctx),
+            title: Text(
               'Đăng xuất?',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimary(ctx),
               ),
             ),
-            content: const Text(
+            content: Text(
               'Bạn có chắc muốn đăng xuất khỏi tài khoản không?',
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: AppColors.textSecondary(ctx)),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
-                child: const Text(
+                child: Text(
                   'Huỷ',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: AppColors.textSecondary(ctx)),
                 ),
               ),
               TextButton(
@@ -84,7 +111,11 @@ class _SettingsPageState extends State<SettingsPage> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('$feature sẽ sớm ra mắt! 🚀'),
+          content: Text(
+            '$feature sẽ sớm ra mắt! 🚀',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -99,88 +130,95 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildProfileCard(),
-            const SizedBox(height: 28),
-            _buildSection(
-              title: 'Tài khoản & Gói cước',
-              items: [
-                _SettingItem(
-                  icon: Icons.star_rounded,
-                  iconColor: Colors.orange,
-                  title: 'Gói Premium',
-                  subtitle: 'Mở khoá tính năng nâng cao',
-                  badge: 'HOT',
-                  onTap: () => _showComingSoon('Tính năng Premium'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _buildSection(
-              title: 'Ứng dụng',
-              items: [
-                _SettingItem(
-                  icon: Icons.language_rounded,
-                  iconColor: Colors.blue,
-                  title: 'Ngôn ngữ',
-                  subtitle: 'Tiếng Việt',
-                  onTap: () => _showComingSoon('Đổi ngôn ngữ'),
-                ),
-                _SettingItem(
-                  icon: Icons.dark_mode_rounded,
-                  iconColor: Colors.deepPurple,
-                  title: 'Chế độ tối',
-                  trailing: Switch(
-                    value: _isDarkMode,
-                    activeColor: AppColors.primary,
-                    onChanged: (val) => setState(() => _isDarkMode = val),
+      backgroundColor: AppColors.background(context),
+      appBar: _buildAppBar(context),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildProfileCard(context),
+              const SizedBox(height: 28),
+              _buildSection(
+                context: context,
+                title: 'Tài khoản & Gói cước',
+                items: [
+                  _SettingItem(
+                    icon: Icons.star_rounded,
+                    iconColor: Colors.orange,
+                    title: 'Gói Premium',
+                    subtitle: 'Mở khoá tính năng nâng cao',
+                    badge: 'HOT',
+                    onTap: () => _showComingSoon('Tính năng Premium'),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            _buildSection(
-              title: 'Hỗ trợ',
-              items: [
-                _SettingItem(
-                  icon: Icons.headset_mic_rounded,
-                  iconColor: Colors.green,
-                  title: 'Liên hệ hỗ trợ',
-                  subtitle: 'Gửi yêu cầu hoặc báo lỗi',
-                  onTap: () => _showComingSoon('Liên hệ'),
-                ),
-                _SettingItem(
-                  icon: Icons.info_outline_rounded,
-                  iconColor: Colors.blueGrey,
-                  title: 'Phiên bản',
-                  subtitle: '1.0.0 (Build 2026)',
-                ),
-              ],
-            ),
-            const SizedBox(height: 36),
-            _buildLogoutButton(),
-            const SizedBox(height: 24),
-          ],
+                ],
+              ),
+              const SizedBox(height: 20),
+              _buildSection(
+                context: context,
+                title: 'Ứng dụng',
+                items: [
+                  _SettingItem(
+                    icon: Icons.language_rounded,
+                    iconColor: Colors.blue,
+                    title: 'Ngôn ngữ',
+                    subtitle: 'Tiếng Việt',
+                    onTap: () => _showComingSoon('Đổi ngôn ngữ'),
+                  ),
+                  _SettingItem(
+                    icon: Icons.dark_mode_rounded,
+                    iconColor: Colors.deepPurple,
+                    title: 'Chế độ tối',
+                    trailing: Switch(
+                      value: ref.watch(themeModeProvider) == ThemeMode.dark,
+                      activeColor: AppColors.primary,
+                      onChanged: (val) => ref
+                          .read(themeModeProvider.notifier)
+                          .setThemeMode(val ? ThemeMode.dark : ThemeMode.light),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _buildSection(
+                context: context,
+                title: 'Hỗ trợ',
+                items: [
+                  _SettingItem(
+                    icon: Icons.headset_mic_rounded,
+                    iconColor: Colors.green,
+                    title: 'Liên hệ hỗ trợ',
+                    subtitle: 'Gửi yêu cầu hoặc báo lỗi',
+                    onTap: () => _showComingSoon('Liên hệ'),
+                  ),
+                  _SettingItem(
+                    icon: Icons.info_outline_rounded,
+                    iconColor: Colors.blueGrey,
+                    title: 'Phiên bản',
+                    subtitle: _appVersion,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 36),
+              _buildLogoutButton(context),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       elevation: 0,
       surfaceTintColor: Colors.transparent,
-      title: const Text(
+      title: Text(
         'Cài đặt',
         style: TextStyle(
-          color: AppColors.textPrimary,
+          color: AppColors.textPrimary(context),
           fontWeight: FontWeight.bold,
           fontSize: 20,
         ),
@@ -190,14 +228,16 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   /// Avatar + tên người dùng placeholder ở đầu trang
-  Widget _buildProfileCard() {
+  Widget _buildProfileCard(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
             AppColors.primary.withOpacity(0.15),
-            AppColors.primary.withOpacity(0.04),
+            AppColors.primary.withOpacity(isDark ? 0.08 : 0.04),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -221,20 +261,20 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Xin chào',
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.textSecondary,
+                    color: AppColors.textSecondary(context),
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  user!.displayName!,
+                  user?.displayName ?? user?.email ?? 'Người dùng',
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textPrimary(context),
                   ),
                 ),
               ],
@@ -261,6 +301,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildSection({
+    required BuildContext context,
     required String title,
     required List<_SettingItem> items,
   }) {
@@ -271,24 +312,26 @@ class _SettingsPageState extends State<SettingsPage> {
           padding: const EdgeInsets.only(left: 4, bottom: 10),
           child: Text(
             title.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
-              color: AppColors.textSecondary,
+              color: AppColors.textSecondary(context),
               letterSpacing: 1.4,
             ),
           ),
         ),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border.withOpacity(0.4)),
+            border: Border.all(
+              color: AppColors.border(context),
+            ),
           ),
           child: Column(
             children: items.asMap().entries.map((e) {
               final isLast = e.key == items.length - 1;
-              return _buildSettingTile(e.value, showDivider: !isLast);
+              return _buildSettingTile(context, e.value, showDivider: !isLast);
             }).toList(),
           ),
         ),
@@ -296,7 +339,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSettingTile(_SettingItem item, {bool showDivider = false}) {
+  Widget _buildSettingTile(BuildContext context, _SettingItem item, {bool showDivider = false}) {
     return Column(
       children: [
         ListTile(
@@ -318,9 +361,9 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 item.title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: AppColors.textPrimary(context),
                   fontSize: 15,
                 ),
               ),
@@ -353,9 +396,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   padding: const EdgeInsets.only(top: 2),
                   child: Text(
                     item.subtitle!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondary(context),
                     ),
                   ),
                 )
@@ -363,9 +406,9 @@ class _SettingsPageState extends State<SettingsPage> {
           trailing:
               item.trailing ??
               (item.onTap != null
-                  ? const Icon(
+                  ? Icon(
                       Icons.chevron_right,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondary(context),
                       size: 20,
                     )
                   : null),
@@ -375,13 +418,13 @@ class _SettingsPageState extends State<SettingsPage> {
             height: 1,
             indent: 72,
             endIndent: 16,
-            color: AppColors.border.withOpacity(0.4),
+            color: AppColors.border(context),
           ),
       ],
     );
   }
 
-  Widget _buildLogoutButton() {
+  Widget _buildLogoutButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(

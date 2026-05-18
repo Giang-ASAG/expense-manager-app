@@ -23,6 +23,22 @@
           }
         },
         {
+          "client_id": "811110866452-a0ee29vsfk1fvq6s9u1ru12nf0fmd5as.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.giang.expensemanager.expense_manager_app",
+            "certificate_hash": "fad1592f0602c8ccbf90a68e7ca2d5661fc6627d"
+          }
+        },
+        {
+          "client_id": "811110866452-eha27jbqdr6g8a19vhum236f63rqs5vs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.giang.expensemanager.expense_manager_app",
+            "certificate_hash": "4e004827b9056d414a19edabb12675d5d496b39e"
+          }
+        },
+        {
           "client_id": "811110866452-kso99eq4ohltu6a2i378n2tfafs6gis5.apps.googleusercontent.com",
           "client_type": 3
         }

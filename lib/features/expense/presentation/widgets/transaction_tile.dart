@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:expense_manager_app/core/style/app_colors.dart';
 
 class TransactionTile extends StatelessWidget {
   final String title;
@@ -25,26 +26,53 @@ class TransactionTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF4F5F7),
+              color: AppColors.surface(context),
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border(context)),
             ),
-            child: Icon(icon, color: Colors.black87),
+            child: Icon(icon, color: AppColors.textPrimary(context)),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(date, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: AppColors.textPrimary(context),
+                  ),
+                ),
+                Text(
+                  date,
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              Text(paymentMethod, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              Text(
+                amount,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: AppColors.textPrimary(context),
+                ),
+              ),
+              Text(
+                paymentMethod,
+                style: TextStyle(
+                  color: AppColors.textSecondary(context),
+                  fontSize: 12,
+                ),
+              ),
             ],
           ),
         ],

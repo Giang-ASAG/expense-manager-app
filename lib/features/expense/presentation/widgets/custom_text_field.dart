@@ -1,3 +1,4 @@
+import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -26,25 +27,26 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFBFBFB),
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE8E9EA)),
+        border: Border.all(color: AppColors.border(context)),
       ),
-      child: TextFormField(              // ✅ TextFormField thay vì TextField
+      child: TextFormField(
         controller: controller,
         obscureText: isPassword,
         keyboardType: keyboardType,
         textInputAction: textInputAction,
-        validator: validator,            // ✅ validator hoạt động với Form
+        validator: validator,
+        style: TextStyle(color: AppColors.textPrimary(context)),
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hintText,
-          hintStyle: const TextStyle(color: Color(0xFFBDBDBD)),
-          prefixIcon: Icon(prefixIcon, color: const Color(0xFF1A1D1E)),
+          hintStyle: TextStyle(color: AppColors.textSecondary(context).withOpacity(0.5)),
+          prefixIcon: Icon(prefixIcon, color: AppColors.textPrimary(context)),
           suffixIcon: suffixIcon,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
           errorStyle: const TextStyle(fontSize: 12),
-          errorBorder: InputBorder.none,        // giữ style container
+          errorBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
         ),
       ),

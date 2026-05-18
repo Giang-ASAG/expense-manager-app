@@ -81,14 +81,18 @@ class _TransactionHistoryPageState
     final transactionsAsync = ref.watch(allTransactionsProvider(widget.id));
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
-        title: const Text(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppColors.textPrimary(context)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
           'Lịch sử giao dịch',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimary(context),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -109,22 +113,22 @@ class _TransactionHistoryPageState
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: AppColors.border(context)),
                 ),
                 child: Column(
                   children: [
-                    _buildMonthHeader(),
+                    _buildMonthHeader(context),
                     const SizedBox(height: 12),
-                    _buildWeekdayLabels(),
+                    _buildWeekdayLabels(context),
                     const SizedBox(height: 8),
-                    _buildCalendarGrid(dailyMap),
+                    _buildCalendarGrid(dailyMap, context),
                   ],
                 ),
               ),
               const SizedBox(height: 8),
-              Expanded(child: _buildTransactionList(filtered)),
+              Expanded(child: _buildTransactionList(filtered, context)),
             ],
           );
         },
@@ -134,31 +138,31 @@ class _TransactionHistoryPageState
 
   // ── Calendar Widgets ──────────────────────────────────────────────────────
 
-  Widget _buildMonthHeader() {
+  Widget _buildMonthHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
           onPressed: _prevMonth,
-          icon: const Icon(Icons.chevron_left, color: AppColors.textPrimary),
+          icon: Icon(Icons.chevron_left, color: AppColors.textPrimary(context)),
         ),
         Text(
           DateFormat('MMMM, yyyy', 'vi').format(_focusedMonth),
-          style: const TextStyle(
-            color: AppColors.textPrimary,
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
         ),
         IconButton(
           onPressed: _nextMonth,
-          icon: const Icon(Icons.chevron_right, color: AppColors.textPrimary),
+          icon: Icon(Icons.chevron_right, color: AppColors.textPrimary(context)),
         ),
       ],
     );
   }
 
-  Widget _buildWeekdayLabels() {
+  Widget _buildWeekdayLabels(BuildContext context) {
     const labels = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
     return Row(
       children: labels
@@ -167,8 +171,8 @@ class _TransactionHistoryPageState
           child: Center(
             child: Text(
               l,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: AppColors.textSecondary(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -180,7 +184,7 @@ class _TransactionHistoryPageState
     );
   }
 
-  Widget _buildCalendarGrid(Map<String, Map<String, double>> dailyMap) {
+  Widget _buildCalendarGrid(Map<String, Map<String, double>> dailyMap, BuildContext context) {
     final firstDay = DateTime(_focusedMonth.year, _focusedMonth.month, 1);
     final daysInMonth =
         DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0).day;
@@ -189,7 +193,7 @@ class _TransactionHistoryPageState
     final List<Widget> cells = [
       for (int i = 0; i < startWeekday; i++) const SizedBox(),
       for (int day = 1; day <= daysInMonth; day++)
-        _buildDayCell(day, dailyMap),
+        _buildDayCell(day, dailyMap, context),
     ];
 
     return GridView.count(
@@ -202,7 +206,7 @@ class _TransactionHistoryPageState
   }
 
   Widget _buildDayCell(
-      int day, Map<String, Map<String, double>> dailyMap) {
+      int day, Map<String, Map<String, double>> dailyMap, BuildContext context) {
     final date = DateTime(_focusedMonth.year, _focusedMonth.month, day);
     final key = _dateKey(date);
     final isSelected = _selectedDate != null && _dateKey(_selectedDate!) == key;
@@ -228,9 +232,9 @@ class _TransactionHistoryPageState
         margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF2D4BFF)
+              ? AppColors.primary
               : isToday
-              ? const Color(0xFF2D4BFF).withOpacity(0.15)
+              ? AppColors.primary.withOpacity(0.15)
               : Colors.transparent,
           shape: BoxShape.circle,
         ),
@@ -240,7 +244,7 @@ class _TransactionHistoryPageState
             Text(
               '$day',
               style: TextStyle(
-                color: isSelected ? Colors.white : AppColors.textPrimary,
+                color: isSelected ? Colors.white : AppColors.textPrimary(context),
                 fontWeight: isToday || isSelected
                     ? FontWeight.bold
                     : FontWeight.normal,
@@ -251,7 +255,7 @@ class _TransactionHistoryPageState
               Text(
                 badgeText,
                 style: TextStyle(
-                  color: isSelected ? Colors.white70 : badgeColor,
+                  color: isSelected ? Colors.white.withOpacity(0.8) : badgeColor,
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
                 ),
@@ -264,18 +268,18 @@ class _TransactionHistoryPageState
 
   // ── Transaction List ──────────────────────────────────────────────────────
 
-  Widget _buildTransactionList(List<TransactionModel> items) {
+  Widget _buildTransactionList(List<TransactionModel> items, BuildContext context) {
     if (items.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.receipt_long_outlined,
-                size: 48, color: AppColors.textSecondary),
-            SizedBox(height: 8),
+                size: 48, color: AppColors.textSecondary(context)),
+            const SizedBox(height: 8),
             Text(
               'Không có giao dịch',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14),
             ),
           ],
         ),
@@ -293,14 +297,14 @@ class _TransactionHistoryPageState
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount:
       dateKeys.fold(0, (sum, k) => sum! + 1 + grouped[k]!.length),
-      itemBuilder: (context, index) {
+      itemBuilder: (ctx, index) {
         int cursor = 0;
         for (final key in dateKeys) {
-          if (index == cursor) return _buildDateHeader(key, grouped[key]!);
+          if (index == cursor) return _buildDateHeader(key, grouped[key]!, context);
           cursor++;
           final list = grouped[key]!;
           if (index < cursor + list.length) {
-            return _buildTransactionItem(list[index - cursor]);
+            return _buildTransactionItem(list[index - cursor], context);
           }
           cursor += list.length;
         }
@@ -310,7 +314,7 @@ class _TransactionHistoryPageState
   }
 
   Widget _buildDateHeader(
-      String dateStr, List<TransactionModel> txList) {
+      String dateStr, List<TransactionModel> txList, BuildContext context) {
     final date = DateTime.tryParse(dateStr);
     final label =
     date == null ? dateStr : DateFormat('dd/MM/yyyy', 'vi').format(date);
@@ -330,15 +334,15 @@ class _TransactionHistoryPageState
       child: Row(
         children: [
           Text(label,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               )),
           const SizedBox(width: 8),
           Text(weekday,
-              style: const TextStyle(
-                  color: AppColors.textSecondary, fontSize: 12)),
+              style: TextStyle(
+                  color: AppColors.textSecondary(context), fontSize: 12)),
           const Spacer(),
           if (income > 0)
             Text('+${fmt.format(income)}',
@@ -358,19 +362,16 @@ class _TransactionHistoryPageState
     );
   }
 
-  Widget _buildTransactionItem(TransactionModel tx) {
+  Widget _buildTransactionItem(TransactionModel tx, BuildContext context) {
     final isExpense = tx.type == 'expense';
     final isTransfer = tx.type == 'transfer';
     final fmt = NumberFormat.currency(
         locale: 'vi', symbol: '₫', decimalDigits: 0);
 
-    final Color iconBg = isTransfer
-        ? Colors.blue.shade50
-        : isExpense
-        ? Colors.red.shade50
-        : Colors.green.shade50;
     final Color iconColor =
     isTransfer ? Colors.blue : isExpense ? AppColors.danger : AppColors.success;
+    final Color iconBg = iconColor.withOpacity(0.1);
+    
     final IconData iconData = isTransfer
         ? CategoryModel.transferCategory.iconData
         : _getIconForCategory(tx.category);
@@ -382,9 +383,9 @@ class _TransactionHistoryPageState
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: Row(
         children: [
@@ -401,8 +402,8 @@ class _TransactionHistoryPageState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(tx.name,
-                    style: const TextStyle(
-                        color: AppColors.textPrimary,
+                    style: TextStyle(
+                        color: AppColors.textPrimary(context),
                         fontWeight: FontWeight.w600,
                         fontSize: 15),
                     maxLines: 1,
@@ -410,8 +411,8 @@ class _TransactionHistoryPageState
                 const SizedBox(height: 2),
                 Text(
                   isTransfer ? 'Chuyển tiền' : (tx.category ?? ''),
-                  style: const TextStyle(
-                      color: AppColors.textSecondary, fontSize: 12),
+                  style: TextStyle(
+                      color: AppColors.textSecondary(context), fontSize: 12),
                 ),
               ],
             ),

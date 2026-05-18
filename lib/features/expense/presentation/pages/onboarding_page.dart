@@ -1,10 +1,10 @@
+import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:expense_manager_app/features/expense/domain/entities/onboarding_entity.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/login_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/onboarding_content.dart';
-// import domain/entities/onboarding_entity.dart
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({Key? key}) : super(key: key);
@@ -41,7 +41,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   void dispose() {
-    _pageController.dispose(); // Đừng quên dispose để tránh rò rỉ bộ nhớ
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -50,7 +50,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('is_first_time', false);
 
-      if (!mounted) return; // Thêm kiểm tra mounted để tránh lỗi nếu người dùng thoát app nhanh
+      if (!mounted) return;
 
       Navigator.pushReplacement(
         context,
@@ -58,8 +58,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
       );
     } else {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 400), // Tăng lên 400ms cho mượt
-        curve: Curves.easeInOut, // Hiệu ứng mượt hơn easeIn
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
       );
     }
   }
@@ -67,7 +67,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: Column(
         children: [
           Expanded(
@@ -85,7 +85,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           // Indicator (Dấu chấm)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(3, (index) => _buildDot(index)),
+            children: List.generate(3, (index) => _buildDot(index, context)),
           ),
           const SizedBox(height: 40),
           // Nút LET'S GO
@@ -106,16 +106,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  Widget _buildDot(int index) {
+  Widget _buildDot(int index, BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.only(right: 8),
-      height: 6, // Tăng độ dày một chút cho dễ nhìn
-      width: _currentPage == index ? 24 : 8, // Hiệu ứng thanh dài thanh ngắn
+      height: 6,
+      width: _currentPage == index ? 24 : 8,
       decoration: BoxDecoration(
         color: _currentPage == index
-            ? const Color(0xFF2D4BFF)
-            : const Color(0xFFE8E9EA),
+            ? AppColors.primary
+            : AppColors.border(context),
         borderRadius: BorderRadius.circular(3),
       ),
     );

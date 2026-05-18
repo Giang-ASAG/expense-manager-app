@@ -11,7 +11,7 @@ class TransactionsSection extends StatelessWidget {
     this.onSeeAll,
   });
 
-  final List<TransactionModel> transactions; // ✅ Đổi từ Stream → List
+  final List<TransactionModel> transactions;
   final VoidCallback? onSeeAll;
 
   @override
@@ -20,16 +20,15 @@ class TransactionsSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          _buildHeader(),
+          _buildHeader(context),
           const SizedBox(height: 14),
-          // ✅ Xoá StreamBuilder, dùng trực tiếp
           if (transactions.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
                 child: Text(
                   'Chưa có giao dịch nào',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: AppColors.textSecondary(context)),
                 ),
               ),
             )
@@ -42,13 +41,11 @@ class TransactionsSection extends StatelessWidget {
     );
   }
 
-  // ... _buildHeader() và TransactionItem giữ nguyên
-
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text('Giao dịch gần đây', style: AppTextStyles.sectionTitle),
+        Text('Giao dịch gần đây', style: AppTextStyles.sectionTitle(context)),
         GestureDetector(
           onTap: onSeeAll,
           child: const Text(
@@ -65,14 +62,11 @@ class TransactionsSection extends StatelessWidget {
   }
 }
 
-// ── Single item ──────────────────────────────────────────────────────────────
-
 class TransactionItem extends StatelessWidget {
   const TransactionItem({super.key, required this.tx});
 
   final TransactionModel tx;
 
-  // Convert TransactionModel → display props
   bool get _isIncome => tx.type == 'income';
   bool get _isTransfer => tx.type == 'transfer';
 
@@ -81,12 +75,6 @@ class TransactionItem extends StatelessWidget {
       : _isIncome
       ? AppColors.success
       : AppColors.danger;
-
-  Color get _colorLight => _isTransfer
-      ? Colors.blue.shade50
-      : _isIncome
-      ? AppColors.successLight
-      : AppColors.dangerLight;
 
   IconData get _icon {
     if (_isTransfer) return Icons.swap_horiz_rounded;
@@ -132,12 +120,12 @@ class TransactionItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.04),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -145,38 +133,38 @@ class TransactionItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildIcon(),
+          _buildIcon(context),
           const SizedBox(width: 14),
-          _buildInfo(),
+          _buildInfo(context),
           _buildAmount(),
         ],
       ),
     );
   }
 
-  Widget _buildIcon() {
+  Widget _buildIcon(BuildContext context) {
     return Container(
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: _colorLight,
+        color: _color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(_icon, color: _color, size: 20),
     );
   }
 
-  Widget _buildInfo() {
+  Widget _buildInfo(BuildContext context) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             tx.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: AppColors.textPrimary(context),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -186,7 +174,7 @@ class TransactionItem extends StatelessWidget {
             _isTransfer
                 ? 'Chuyển tiền · $_dateLabel'
                 : '${tx.category ?? ''} · $_dateLabel',
-            style: AppTextStyles.labelMuted,
+            style: AppTextStyles.labelMuted(context),
           ),
         ],
       ),

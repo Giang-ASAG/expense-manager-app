@@ -1,4 +1,5 @@
 import 'package:expense_manager_app/core/services/rtdb_service.dart';
+import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:expense_manager_app/features/expense/data/datasources/auth_remote_data_source.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/create_new_password_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/register_page.dart';
@@ -22,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final _authDataSource = AuthRemoteDataSource();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -32,6 +34,20 @@ class _LoginPageState extends State<LoginPage> {
 
   void _setLoading(bool value) {
     if (mounted) setState(() => _isLoading = value);
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: isError ? AppColors.danger : AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   Future<void> _handleLogin() async {
@@ -59,14 +75,10 @@ class _LoginPageState extends State<LoginPage> {
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Đăng nhập thất bại: ${e.message}')),
-      );
+      _showSnackBar('Đăng nhập thất bại: ${e.message}', isError: true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã có lỗi xảy ra. Vui lòng thử lại.')),
-      );
+      _showSnackBar('Đã có lỗi xảy ra. Vui lòng thử lại.', isError: true);
     } finally {
       _setLoading(false);
     }
@@ -93,12 +105,32 @@ class _LoginPageState extends State<LoginPage> {
             builder: (_) => MainPage(user: userCredential.user!),
           ),
         );
+      } else {
+        if (!mounted) return;
+        _showSnackBar('Đăng nhập Google bị hủy bỏ');
       }
-    } catch (e) {
+    } on Exception catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Đăng nhập thất bại: $e')));
+
+      // Xử lý các loại lỗi khác nhau
+      String errorMessage = 'Đăng nhập thất bại';
+
+      if (e.toString().contains('DEVELOPER_ERROR')) {
+        errorMessage =
+            'Lỗi Firebase: Cấu hình Google Sign-In chưa đúng. Vui lòng kiểm tra SHA-1 fingerprint trong Firebase Console.';
+      } else if (e.toString().contains('sign_in_failed')) {
+        errorMessage =
+            'Google Sign-In thất bại. Vui lòng thử lại hoặc kiểm tra kết nối mạng.';
+      } else if (e.toString().contains('NETWORK_ERROR')) {
+        errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra Internet.';
+      } else if (e.toString().contains('CANCELED')) {
+        errorMessage = 'Người dùng hủy bỏ đăng nhập';
+      } else {
+        errorMessage = 'Lỗi: ${e.toString()}';
+      }
+
+      _showSnackBar(errorMessage, isError: true);
+      print('Google Login Error: $e');
     } finally {
       _setLoading(false);
     }
@@ -109,81 +141,84 @@ class _LoginPageState extends State<LoginPage> {
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.background(context),
           body: SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
                   const SizedBox(height: 60),
-                  Image.asset(
-                    'assets/images/logo_app.png',
-                    // Hoặc file logo riêng của anh
-                    height: 120, // Anh có thể chỉnh kích thước lớn nhỏ tùy ý
-                    fit: BoxFit.contain,
+                  Hero(
+                    tag: 'logo',
+                    child: Image.asset(
+                      'assets/images/logo_app.png',
+                      height: 120,
+                      fit: BoxFit.contain,
+                    ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  const Text(
+                  Text(
                     'Ví Khôn',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Color(
-                        0xFF2D4BFF,
-                      ), // Cho màu xanh cho đồng bộ với nút
+                      color: AppColors.primary,
                     ),
                   ),
                   const SizedBox(height: 40),
 
                   // Form đăng nhập
-                  // CustomTextField(
-                  //   hintText: 'Email',
-                  //   prefixIcon: Icons.person_outline,
-                  //   controller: _emailController,
-                  // ),
-                  // const SizedBox(height: 16),
-                  // CustomTextField(
-                  //   hintText: 'Mật khẩu',
-                  //   prefixIcon: Icons.lock_outline,
-                  //   controller: _passwordController,
-                  //   isPassword: true,
-                  //   suffixIcon: const Icon(
-                  //     Icons.visibility_outlined,
-                  //     color: Colors.grey,
-                  //   ),
-                  // ),
+                  CustomTextField(
+                    hintText: 'Email',
+                    prefixIcon: Icons.person_outline,
+                    controller: _emailController,
+                  ),
+                  const SizedBox(height: 16),
+                  CustomTextField(
+                    hintText: 'Mật khẩu',
+                    prefixIcon: Icons.lock_outline,
+                    controller: _passwordController,
+                    isPassword: _obscurePassword,
+                    suffixIcon: GestureDetector(
+                      onTap: () => setState(() => _obscurePassword = !_obscurePassword),
+                      child: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: AppColors.textSecondary(context),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 32),
 
-                  // PrimaryButton(
-                  //   text: 'ĐĂNG NHẬP',
-                  //   onPressed: _isLoading ? null : _handleLogin,
-                  // ),
-                  // const SizedBox(height: 24),
-                  // TextButton(
-                  //   onPressed: _isLoading
-                  //       ? null
-                  //       : () {
-                  //           Navigator.push(
-                  //             context,
-                  //             MaterialPageRoute(
-                  //               builder: (_) => const CreateNewPasswordPage(),
-                  //             ),
-                  //           );
-                  //         },
-                  //   child: const Text(
-                  //     'QUÊN MẬT KHẨU?',
-                  //     style: TextStyle(
-                  //       color: Color(0xFF7D7E83),
-                  //       fontWeight: FontWeight.bold,
-                  //     ),
-                  //   ),
-                  // ),
+                  PrimaryButton(
+                    text: 'ĐĂNG NHẬP',
+                    onPressed: _isLoading ? null : _handleLogin,
+                  ),
+                  const SizedBox(height: 24),
+                  TextButton(
+                    onPressed: _isLoading
+                        ? null
+                        : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CreateNewPasswordPage(),
+                              ),
+                            );
+                          },
+                    child: Text(
+                      'QUÊN MẬT KHẨU?',
+                      style: TextStyle(
+                        color: AppColors.textSecondary(context),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
 
-                  // const SizedBox(height: 24),
-                  // const Text('Hoặc', style: TextStyle(color: Colors.grey)),
-                  // const SizedBox(height: 24),
+                  const SizedBox(height: 14),
                   // Đăng nhập Google
                   SocialButton(
                     text: 'TIẾP TỤC VỚI GOOGLE',
@@ -197,7 +232,10 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Chưa có tài khoản? '),
+                      Text(
+                        'Chưa có tài khoản? ',
+                        style: TextStyle(color: AppColors.textPrimary(context)),
+                      ),
                       GestureDetector(
                         onTap: _isLoading
                             ? null
@@ -205,14 +243,14 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => RegisterPage(),
+                                    builder: (_) => const RegisterPage(),
                                   ),
                                 );
                               },
-                        child: const Text(
+                        child: Text(
                           'Đăng ký ngay',
                           style: TextStyle(
-                            color: Color(0xFF2D4BFF),
+                            color: AppColors.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -228,9 +266,9 @@ class _LoginPageState extends State<LoginPage> {
         // Loading overlay
         if (_isLoading)
           Container(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withOpacity(0.5),
             child: const Center(
-              child: CircularProgressIndicator(color: Color(0xFF2D4BFF)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             ),
           ),
       ],

@@ -1,3 +1,4 @@
+import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:expense_manager_app/features/expense/presentation/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_text_field.dart';
@@ -42,7 +43,7 @@ class _CreateNewPasswordPageState extends State<CreateNewPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -58,22 +59,23 @@ class _CreateNewPasswordPageState extends State<CreateNewPasswordPage> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
+                    color: AppColors.surface(context),
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFFE8E9EA)),
+                    border: Border.all(color: AppColors.border(context)),
                   ),
-                  child: const Icon(Icons.chevron_left, color: Color(0xFF1A1D1E)),
+                  child: Icon(Icons.chevron_left, color: AppColors.textPrimary(context)),
                 ),
               ),
 
               const SizedBox(height: 32),
 
               // Title
-              const Text(
-                'Create Your New\nPassword',
+              Text(
+                'Tạo mật khẩu mới',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1D1E),
+                  color: AppColors.textPrimary(context),
                   height: 1.3,
                 ),
               ),
@@ -81,11 +83,11 @@ class _CreateNewPasswordPageState extends State<CreateNewPasswordPage> {
               const SizedBox(height: 12),
 
               // Subtitle
-              const Text(
-                'Your new password must be different\nfrom previous password.',
+              Text(
+                'Mật khẩu mới của bạn phải khác với các mật khẩu đã sử dụng trước đó.',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF7D7E83),
+                  color: AppColors.textSecondary(context),
                   height: 1.5,
                 ),
               ),
@@ -94,7 +96,7 @@ class _CreateNewPasswordPageState extends State<CreateNewPasswordPage> {
 
               // New Password Field
               CustomTextField(
-                hintText: 'New Password',
+                hintText: 'Mật khẩu mới',
                 prefixIcon: Icons.lock_outline,
                 isPassword: _obscureNew,
                 controller: _newPasswordController,
@@ -104,7 +106,7 @@ class _CreateNewPasswordPageState extends State<CreateNewPasswordPage> {
                     _obscureNew
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
-                    color: Colors.grey,
+                    color: AppColors.textSecondary(context),
                   ),
                 ),
               ),
@@ -113,7 +115,7 @@ class _CreateNewPasswordPageState extends State<CreateNewPasswordPage> {
 
               // Confirm Password Field
               CustomTextField(
-                hintText: 'Password',
+                hintText: 'Xác nhận mật khẩu',
                 prefixIcon: Icons.lock_outline,
                 isPassword: _obscureConfirm,
                 controller: _confirmPasswordController,
@@ -123,37 +125,16 @@ class _CreateNewPasswordPageState extends State<CreateNewPasswordPage> {
                     _obscureConfirm
                         ? Icons.visibility_outlined
                         : Icons.visibility_off_outlined,
-                    color: Colors.grey,
+                    color: AppColors.textSecondary(context),
                   ),
                 ),
               ),
-
-              // const SizedBox(height: 24),
-              //
-              // // Validation Rules
-              // _ValidationRule(
-              //   label: 'Must not contain your name or email',
-              //   isValid: _hasNoNameOrEmail,
-              //   isActive: _newPasswordController.text.isNotEmpty,
-              // ),
-              // const SizedBox(height: 10),
-              // _ValidationRule(
-              //   label: 'At least 8 characters',
-              //   isValid: _hasMinLength,
-              //   isActive: _newPasswordController.text.isNotEmpty,
-              // ),
-              // const SizedBox(height: 10),
-              // _ValidationRule(
-              //   label: 'Contains a symbol or a number',
-              //   isValid: _hasSymbolOrNumber,
-              //   isActive: _newPasswordController.text.isNotEmpty,
-              // ),
 
               const Spacer(),
 
               // Reset Password Button
               PrimaryButton(
-                text: 'RESET PASSWORD',
+                text: 'ĐẶT LẠI MẬT KHẨU',
                 onPressed: () {
                   // TODO: Handle reset password
                 },
@@ -184,7 +165,7 @@ class _ValidationRule extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color activeColor =
-    isActive && isValid ? const Color(0xFF2D4BFF) : const Color(0xFF7D7E83);
+    isActive && isValid ? AppColors.primary : AppColors.textSecondary(context);
 
     return Row(
       children: [

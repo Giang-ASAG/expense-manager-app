@@ -73,19 +73,19 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.surface(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
+        title: Text(
           'Xoá danh mục?',
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimary(context),
           ),
         ),
         content: RichText(
           text: TextSpan(
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 14,
               height: 1.5,
             ),
@@ -93,8 +93,8 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
               const TextSpan(text: 'Bạn có chắc muốn xoá danh mục '),
               TextSpan(
                 text: '"${category.name}"',
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -114,12 +114,12 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    side: const BorderSide(color: AppColors.border),
+                    side: BorderSide(color: AppColors.border(context)),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Huỷ',
                     style: TextStyle(
-                      color: AppColors.textPrimary,
+                      color: AppColors.textPrimary(context),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -159,15 +159,15 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      backgroundColor: AppColors.background(context),
+      appBar: _buildAppBar(context),
       body: userId == null
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                _buildTopSection(),
-                Expanded(child: _buildCategoryList()),
-                _buildBottomActions(),
+                _buildTopSection(context),
+                Expanded(child: _buildCategoryList(context)),
+                _buildBottomActions(context),
               ],
             ),
     );
@@ -175,9 +175,9 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
 
   // ── App Bar ────────────────────────────────────────────────────────────────
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       elevation: 0,
       leading: Padding(
         padding: const EdgeInsets.all(8),
@@ -185,22 +185,22 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
           onTap: () => Navigator.pop(context),
           child: Container(
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: AppColors.surface(context),
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AppColors.border(context)),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.close,
-              color: AppColors.textPrimary,
+              color: AppColors.textPrimary(context),
               size: 20,
             ),
           ),
         ),
       ),
-      title: const Text(
+      title: Text(
         'Quản lý Danh Mục',
         style: TextStyle(
-          color: AppColors.textPrimary,
+          color: AppColors.textPrimary(context),
           fontWeight: FontWeight.w700,
           fontSize: 18,
           letterSpacing: -0.3,
@@ -212,38 +212,38 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
 
   // ── Top Section ────────────────────────────────────────────────────────────
 
-  Widget _buildTopSection() {
+  Widget _buildTopSection(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
       child: Column(
         children: [
-          _buildTypeToggle(),
+          _buildTypeToggle(context),
           const SizedBox(height: 20),
-          _buildCategoryHeader(),
+          _buildCategoryHeader(context),
           const SizedBox(height: 4),
-          const Divider(color: AppColors.border),
+          Divider(color: AppColors.border(context)),
         ],
       ),
     );
   }
 
-  Widget _buildTypeToggle() {
+  Widget _buildTypeToggle(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.border.withOpacity(0.4),
+        color: AppColors.border(context).withOpacity(0.4),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          _toggleItem('Chi phí', isExpense, AppColors.danger),
-          _toggleItem('Thu nhập', !isExpense, AppColors.success),
+          _toggleItem('Chi phí', isExpense, AppColors.danger, context),
+          _toggleItem('Thu nhập', !isExpense, AppColors.success, context),
         ],
       ),
     );
   }
 
-  Widget _toggleItem(String label, bool isActive, Color activeColor) {
+  Widget _toggleItem(String label, bool isActive, Color activeColor, BuildContext context) {
     return Expanded(
       child: GestureDetector(
         onTap: () => _onToggleType(label == 'Chi phí'),
@@ -268,7 +268,7 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
             child: Text(
               label,
               style: TextStyle(
-                color: isActive ? Colors.white : AppColors.textSecondary,
+                color: isActive ? Colors.white : AppColors.textSecondary(context),
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
               ),
@@ -279,7 +279,7 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
     );
   }
 
-  Widget _buildCategoryHeader() {
+  Widget _buildCategoryHeader(BuildContext context) {
     final accentColor = isExpense ? AppColors.danger : AppColors.success;
 
     // ✅ Riverpod thay StreamBuilder cho count badge
@@ -302,12 +302,12 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Danh mục',
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimary(context),
                 letterSpacing: -0.2,
               ),
             ),
@@ -315,9 +315,9 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
               isExpense
                   ? 'Quản lý danh mục chi tiêu của bạn'
                   : 'Quản lý danh mục thu nhập của bạn',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondary(context),
               ),
             ),
           ],
@@ -344,7 +344,7 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
 
   // ── Category List ──────────────────────────────────────────────────────────
 
-  Widget _buildCategoryList() {
+  Widget _buildCategoryList(BuildContext context) {
     // ✅ Riverpod thay StreamBuilder
     final categoriesAsync = ref.watch(
       categoriesProvider((uid: userId!, isExpense: isExpense)),
@@ -354,21 +354,21 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, __) => const Center(child: Text('Lỗi tải danh mục')),
       data: (categories) {
-        if (categories.isEmpty) return _buildEmptyState();
+        if (categories.isEmpty) return _buildEmptyState(context);
         return FadeTransition(
           opacity: _fadeAnim,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             itemCount: categories.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (_, index) => _buildCategoryTile(categories[index]),
+            itemBuilder: (_, index) => _buildCategoryTile(categories[index], context),
           ),
         );
       },
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     final accentColor = isExpense ? AppColors.danger : AppColors.success;
     return FadeTransition(
       opacity: _fadeAnim,
@@ -389,18 +389,18 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Chưa có danh mục nào',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Nhấn "Tạo mới" để thêm danh mục đầu tiên',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary(context)),
             ),
           ],
         ),
@@ -408,12 +408,12 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
     );
   }
 
-  Widget _buildCategoryTile(CategoryModel category) {
+  Widget _buildCategoryTile(CategoryModel category, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -429,10 +429,10 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
         ),
         title: Text(
           category.name,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 14,
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimary(context),
           ),
         ),
         subtitle: Text(
@@ -486,12 +486,12 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
 
   // ── Bottom Actions ─────────────────────────────────────────────────────────
 
-  Widget _buildBottomActions() {
+  Widget _buildBottomActions(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: const Border(top: BorderSide(color: AppColors.border)),
+        color: AppColors.surface(context),
+        border: Border(top: BorderSide(color: AppColors.border(context))),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -508,13 +508,13 @@ class _ManageCategoriesPageState extends ConsumerState<ManageCategoriesPage>
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: AppColors.background(context),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.border, width: 1.5),
+                border: Border.all(color: AppColors.border(context), width: 1.5),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.swap_vert_rounded,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimary(context),
                 size: 22,
               ),
             ),

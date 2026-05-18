@@ -1,9 +1,9 @@
 import 'package:expense_manager_app/core/database/database_helper.dart';
 import 'package:expense_manager_app/core/services/notification_service.dart';
+import 'package:expense_manager_app/core/style/app_theme.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/login_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/main_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/pages/onboarding_page.dart';
-import 'package:expense_manager_app/features/expense/presentation/pages/overview_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,44 +11,81 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/providers/theme_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // TODO: Khởi tạo Firebase
-  await Firebase.initializeApp();
-  // --- THÊM DÒNG NÀY ---
-  // Khởi tạo DatabaseHelper và gọi getter database để nó chạy hàm copy
-  final dbHelper = DatabaseHelper();
-  await dbHelper.database;
-  await initializeDateFormatting('vi', null);
-  await NotificationService.init();
-  await NotificationService.scheduleDailyReminder();
-  // Khởi tạo Dependency Injection (get_it)
-  // await di.init();
+
+  // Khởi tạo Firebase với timeout
+  try {
+    await Firebase.initializeApp().timeout(const Duration(seconds: 10));
+  } catch (e) {
+    print('Firebase initialization error: $e');
+  }
+
+  // Khởi tạo DatabaseHelper
+  try {
+    final dbHelper = DatabaseHelper();
+    await dbHelper.database;
+  } catch (e) {
+    print('Database initialization error: $e');
+  }
+
+  // Khởi tạo date formatting
+  try {
+    await initializeDateFormatting('vi', null);
+  } catch (e) {
+    print('Date formatting initialization error: $e');
+  }
+
+  // Khởi tạo Notification Service
+  try {
+    await NotificationService.init();
+    // Schedule daily reminder - bọc trong try-catch riêng
+    try {
+      await NotificationService.scheduleDailyReminder().timeout(
+        const Duration(seconds: 5),
+      );
+    } catch (e) {
+      print('Notification scheduling error: $e');
+    }
+  } catch (e) {
+    print('Notification initialization error: $e');
+  }
+
+  // Lấy SharedPreferences
   final prefs = await SharedPreferences.getInstance();
-  // Nếu chưa từng lưu 'is_first_time', mặc định nó sẽ là true (lần đầu)
   final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
-  runApp(
-    ProviderScope(
-      // ✅ thêm vào đây
-      child: MyApp(isFirstTime: isFirstTime),
-    ),
-  );
+
+  runApp(ProviderScope(child: MyApp(isFirstTime: isFirstTime)));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   final bool isFirstTime;
 
   const MyApp({super.key, required this.isFirstTime});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
       title: 'Ví Khôn',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('vi', ''),
+        Locale('en', ''),
+      ],
+      locale: const Locale('vi', ''),
       // Logic phân luồng ở đây
       home: isFirstTime
           ? const OnboardingPage()

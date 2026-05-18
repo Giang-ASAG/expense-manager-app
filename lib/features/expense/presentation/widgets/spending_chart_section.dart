@@ -9,11 +9,9 @@ class SpendingChartSection extends StatelessWidget {
     this.totalSpent = 1840000,
   });
 
-  /// Giá trị chuẩn hoá 0.0–1.0 cho 7 ngày (Thứ 2 → Chủ nhật)
+  /// Giá trị chuẩn hoá 0.0–1.0 cho 7 ngày
   final List<double> weekData;
   final double totalSpent;
-
-  late final days = _getLast7Days();
 
   String _formatVND(double amount) {
     return amount
@@ -24,17 +22,16 @@ class SpendingChartSection extends StatelessWidget {
     ) +
         ' đ';
   }
+
   List<String> _getLast7Days() {
     final now = DateTime.now();
     return List.generate(7, (index) {
       final date = now.subtract(Duration(days: 6 - index));
-
-      // Nếu là hôm nay
       if (index == 6) return 'Nay';
-
       return '${date.day}/${date.month}';
     });
   }
+
   @override
   Widget build(BuildContext context) {
     assert(weekData.length == 7, 'weekData phải có đúng 7 phần tử');
@@ -43,12 +40,12 @@ class SpendingChartSection extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.surface(context),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppColors.border(context)),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.06),
+              color: Colors.black.withOpacity(0.03),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -57,29 +54,29 @@ class SpendingChartSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             const SizedBox(height: 4),
             Text(
               'Đã chi ${_formatVND(totalSpent)} tuần này',
-              style: AppTextStyles.labelMuted,
+              style: AppTextStyles.labelMuted(context),
             ),
             const SizedBox(height: 20),
-            _buildBars(),
+            _buildBars(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text('Chi tiêu theo tuần', style: AppTextStyles.sectionTitle),
+        Text('Chi tiêu theo tuần', style: AppTextStyles.sectionTitle(context)),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.primaryLight,
+            color: AppColors.primary.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: const Text(
@@ -95,8 +92,8 @@ class SpendingChartSection extends StatelessWidget {
     );
   }
 
-  Widget _buildBars() {
-    final days = _getLast7Days(); // ✅ đặt ở đây
+  Widget _buildBars(BuildContext context) {
+    final days = _getLast7Days();
 
     return SizedBox(
       height: 90,
@@ -113,7 +110,7 @@ class SpendingChartSection extends StatelessWidget {
                   AnimatedContainer(
                     duration: Duration(milliseconds: 400 + i * 60),
                     curve: Curves.easeOut,
-                    height: weekData[i] * 64,
+                    height: (weekData[i] * 64).clamp(4.0, 64.0),
                     decoration: BoxDecoration(
                       color: isToday
                           ? AppColors.primary
@@ -123,14 +120,14 @@ class SpendingChartSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    days[i], // ✅ dùng đúng
+                    days[i],
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight:
                       isToday ? FontWeight.w700 : FontWeight.w400,
                       color: isToday
                           ? AppColors.primary
-                          : AppColors.textSecondary,
+                          : AppColors.textSecondary(context),
                     ),
                   ),
                 ],

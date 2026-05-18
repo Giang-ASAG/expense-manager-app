@@ -97,9 +97,9 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
     final transferState = ref.watch(transferProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8),
@@ -107,22 +107,22 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
             onTap: () => Navigator.pop(context),
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: AppColors.surface(context),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: AppColors.border(context)),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.close,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimary(context),
                 size: 20,
               ),
             ),
           ),
         ),
-        title: const Text(
+        title: Text(
           'Chuyển tiền',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimary(context),
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -143,7 +143,7 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                       ref.read(transferProvider.notifier).initWallets(wallets);
                     });
 
-                    if (wallets.length < 2) return _buildNotEnoughWallets();
+                    if (wallets.length < 2) return _buildNotEnoughWallets(context);
 
                     return Column(
                       children: [
@@ -152,18 +152,18 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                             padding: const EdgeInsets.all(20),
                             child: Column(
                               children: [
-                                _buildTransferCard(transferState, wallets),
+                                _buildTransferCard(transferState, wallets, context),
                                 const SizedBox(height: 24),
-                                _buildAmountInput(),
+                                _buildAmountInput(context),
                                 const SizedBox(height: 16),
-                                _buildNoteInput(),
+                                _buildNoteInput(context),
                                 const SizedBox(height: 16),
-                                _buildBalanceInfo(transferState),
+                                _buildBalanceInfo(transferState, context),
                               ],
                             ),
                           ),
                         ),
-                        _buildConfirmButton(transferState),
+                        _buildConfirmButton(transferState, context),
                       ],
                     );
                   },
@@ -173,13 +173,13 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
 
   // ── Transfer Card ──────────────────────────────────────────────────────────
 
-  Widget _buildTransferCard(TransferState state, List<WalletModel> wallets) {
+  Widget _buildTransferCard(TransferState state, List<WalletModel> wallets, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -195,11 +195,13 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                   isFrom: true,
                   wallets: wallets,
                   state: state,
+                  context: context,
                 ),
+                context: context,
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Divider(color: AppColors.border),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Divider(color: AppColors.border(context)),
               ),
               _buildWalletSelector(
                 label: 'Đến ví',
@@ -210,7 +212,9 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                   isFrom: false,
                   wallets: wallets,
                   state: state,
+                  context: context,
                 ),
+                context: context,
               ),
             ],
           ),
@@ -219,9 +223,9 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: AppColors.background(context),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: AppColors.border(context)),
               ),
               child: const Icon(Icons.swap_vert, color: AppColors.primary),
             ),
@@ -237,6 +241,7 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
+    required BuildContext context,
   }) {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
@@ -256,9 +261,9 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: AppColors.textSecondary(context),
                     ),
                   ),
                   Text(
@@ -267,16 +272,16 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: wallet != null
-                          ? AppColors.textPrimary
-                          : AppColors.textSecondary,
+                          ? AppColors.textPrimary(context)
+                          : AppColors.textSecondary(context),
                     ),
                   ),
                   if (wallet != null)
                     Text(
                       wallet.bankName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: AppColors.textSecondary(context),
                       ),
                     ),
                 ],
@@ -285,14 +290,14 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
             if (wallet != null)
               Text(
                 _formatCurrency(wallet.balance),
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
-                  color: AppColors.textPrimary,
+                  color: AppColors.textPrimary(context),
                 ),
               ),
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+            Icon(Icons.chevron_right, color: AppColors.textSecondary(context)),
           ],
         ),
       ),
@@ -305,10 +310,11 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
     required bool isFrom,
     required List<WalletModel> wallets,
     required TransferState state,
+    required BuildContext context,
   }) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.surface(context),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -323,7 +329,7 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border,
+                  color: AppColors.border(context),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -331,10 +337,10 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
             const SizedBox(height: 16),
             Text(
               isFrom ? 'Chọn ví nguồn' : 'Chọn ví đích',
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 16,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 12),
@@ -358,10 +364,10 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary.withOpacity(0.08)
-                        : AppColors.background,
+                        : AppColors.background(context),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: isSelected ? AppColors.primary : AppColors.border,
+                      color: isSelected ? AppColors.primary : AppColors.border(context),
                       width: isSelected ? 1.5 : 1,
                     ),
                   ),
@@ -382,17 +388,17 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                           children: [
                             Text(
                               wallet.accountName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
-                                color: AppColors.textPrimary,
+                                color: AppColors.textPrimary(context),
                               ),
                             ),
                             Text(
                               wallet.bankName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
-                                color: AppColors.textSecondary,
+                                color: AppColors.textSecondary(context),
                               ),
                             ),
                           ],
@@ -403,10 +409,10 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                         children: [
                           Text(
                             _formatCurrency(wallet.balance),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 13,
-                              color: AppColors.textPrimary,
+                              color: AppColors.textPrimary(context),
                             ),
                           ),
                           if (wallet.isDefault)
@@ -451,22 +457,22 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
 
   // ── Amount / Note / Balance ────────────────────────────────────────────────
 
-  Widget _buildAmountInput() {
+  Widget _buildAmountInput(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Số tiền chuyển',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: AppColors.textPrimary(context),
             ),
           ),
           TextField(
@@ -483,6 +489,9 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
               hintText: '0',
               suffixText: 'đ',
               border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              filled: false,
             ),
           ),
           Row(
@@ -498,17 +507,17 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 7),
                       decoration: BoxDecoration(
-                        color: AppColors.background,
+                        color: AppColors.background(context),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: AppColors.border(context)),
                       ),
                       child: Center(
                         child: Text(
                           _shortCurrency(amount),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                            color: AppColors.textSecondary(context),
                           ),
                         ),
                       ),
@@ -523,26 +532,31 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
     );
   }
 
-  Widget _buildNoteInput() {
+  Widget _buildNoteInput(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: TextField(
         controller: _noteController,
-        decoration: const InputDecoration(
-          icon: Icon(Icons.notes, color: AppColors.textSecondary),
+        style: TextStyle(color: AppColors.textPrimary(context)),
+        decoration: InputDecoration(
+          icon: Icon(Icons.notes, color: AppColors.textSecondary(context)),
           hintText: 'Ghi chú chuyển khoản',
+          hintStyle: TextStyle(color: AppColors.textSecondary(context)),
           border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          filled: false,
         ),
       ),
     );
   }
 
-  Widget _buildBalanceInfo(TransferState state) {
+  Widget _buildBalanceInfo(TransferState state, BuildContext context) {
     if (state.fromWallet == null || _parsedAmount <= 0) {
       return const SizedBox.shrink();
     }
@@ -583,7 +597,7 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
     );
   }
 
-  Widget _buildNotEnoughWallets() {
+  Widget _buildNotEnoughWallets(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -593,30 +607,30 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: AppColors.surface(context),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: AppColors.border(context)),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.account_balance_wallet_outlined,
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondary(context),
                 size: 40,
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Cần ít nhất 2 ví',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
-                color: AppColors.textPrimary,
+                color: AppColors.textPrimary(context),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Bạn cần có ít nhất 2 ví để thực hiện chuyển tiền',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+              style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14),
             ),
           ],
         ),
@@ -624,7 +638,7 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
     );
   }
 
-  Widget _buildConfirmButton(TransferState state) {
+  Widget _buildConfirmButton(TransferState state, BuildContext context) {
     final canTransfer =
         state.fromWallet != null &&
         state.toWallet != null &&
@@ -634,9 +648,9 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: AppColors.surface(context),
+        border: Border(top: BorderSide(color: AppColors.border(context))),
       ),
       child: SizedBox(
         width: double.infinity,
@@ -645,7 +659,7 @@ class _TransferMoneyPageState extends ConsumerState<TransferMoneyPage> {
           onPressed: canTransfer && !state.isSaving ? _onTransfer : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            disabledBackgroundColor: AppColors.border,
+            disabledBackgroundColor: AppColors.border(context),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),

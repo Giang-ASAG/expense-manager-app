@@ -1,5 +1,6 @@
+import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:expense_manager_app/features/expense/data/datasources/auth_remote_data_source.dart';
-import 'package:expense_manager_app/features/expense/presentation/pages/overview_page.dart';
+import 'package:expense_manager_app/features/expense/presentation/pages/main_page.dart';
 import 'package:expense_manager_app/features/expense/presentation/widgets/custom_text_field.dart';
 import 'package:expense_manager_app/features/expense/presentation/widgets/primary_button.dart';
 import 'package:expense_manager_app/features/expense/presentation/widgets/social_button.dart';
@@ -56,7 +57,7 @@ class _RegisterPageState extends State<RegisterPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => OverviewPage(user: credential.user),
+            builder: (_) => MainPage(user: credential.user),
           ),
         );
       }
@@ -83,8 +84,11 @@ class _RegisterPageState extends State<RegisterPage> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
+        content: Text(
+          message,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -96,7 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -108,29 +112,31 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 16),
                 _BackButton(),
                 const SizedBox(height: 32),
-                _buildHeader(),
+                _buildHeader(context),
                 const SizedBox(height: 32),
-                _buildEmailField(),
+                _buildEmailField(context),
                 const SizedBox(height: 16),
-                _buildPasswordField(),
+                _buildPasswordField(context),
                 const SizedBox(height: 16),
-                _buildConfirmPasswordField(),
+                _buildConfirmPasswordField(context),
                 const SizedBox(height: 20),
-                _buildTermsCheckbox(),
+                _buildTermsCheckbox(context),
                 const SizedBox(height: 24),
                 _buildRegisterButton(),
                 const SizedBox(height: 24),
-                const Center(
-                  child: Text('Hoặc', style: TextStyle(color: Colors.grey)),
+                Center(
+                  child: Text('Hoặc', style: TextStyle(color: AppColors.textSecondary(context))),
                 ),
                 const SizedBox(height: 24),
                 SocialButton(
                   text: 'TIẾP TỤC VỚI GOOGLE',
                   iconPath: 'assets/images/google_icon.png',
-                  onPressed: () {},
+                  onPressed: () {
+                    // TODO: Google Sign up
+                  },
                 ),
                 const SizedBox(height: 32),
-                _buildLoginLink(),
+                _buildLoginLink(context),
                 const SizedBox(height: 24),
               ],
             ),
@@ -142,7 +148,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // ── Widgets ──────────────────────────────────────────────────────────────
 
-  Widget _buildHeader() => const Column(
+  Widget _buildHeader(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
@@ -150,19 +156,19 @@ class _RegisterPageState extends State<RegisterPage> {
         style: TextStyle(
           fontSize: 28,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF1A1D1E),
+          color: AppColors.textPrimary(context),
           height: 1.3,
         ),
       ),
-      SizedBox(height: 8),
+      const SizedBox(height: 8),
       Text(
         'Điền thông tin bên dưới để bắt đầu.',
-        style: TextStyle(fontSize: 14, color: Color(0xFF7D7E83)),
+        style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context)),
       ),
     ],
   );
 
-  Widget _buildEmailField() => CustomTextField(
+  Widget _buildEmailField(BuildContext context) => CustomTextField(
     hintText: 'Email',
     prefixIcon: Icons.email_outlined,
     controller: _emailController,
@@ -177,7 +183,7 @@ class _RegisterPageState extends State<RegisterPage> {
     },
   );
 
-  Widget _buildPasswordField() => CustomTextField(
+  Widget _buildPasswordField(BuildContext context) => CustomTextField(
     hintText: 'Mật khẩu',
     prefixIcon: Icons.lock_outline,
     controller: _passwordController,
@@ -193,7 +199,7 @@ class _RegisterPageState extends State<RegisterPage> {
     },
   );
 
-  Widget _buildConfirmPasswordField() => CustomTextField(
+  Widget _buildConfirmPasswordField(BuildContext context) => CustomTextField(
     hintText: 'Xác nhận mật khẩu',
     prefixIcon: Icons.lock_outline,
     controller: _confirmPasswordController,
@@ -210,11 +216,13 @@ class _RegisterPageState extends State<RegisterPage> {
     },
   );
 
-  Widget _buildTermsCheckbox() => Row(
+  Widget _buildTermsCheckbox(BuildContext context) => Row(
     children: [
       Checkbox(
         value: _agreeToTerms,
-        activeColor: const Color(0xFF2D4BFF),
+        activeColor: AppColors.primary,
+        checkColor: Colors.white,
+        side: BorderSide(color: AppColors.border(context), width: 1.5),
         shape:
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         onChanged: (value) =>
@@ -222,22 +230,22 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       Expanded(
         child: RichText(
-          text: const TextSpan(
+          text: TextSpan(
             text: 'Tôi đồng ý với ',
-            style: TextStyle(color: Color(0xFF7D7E83), fontSize: 13),
+            style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13),
             children: [
-              TextSpan(
+              const TextSpan(
                 text: 'Điều khoản dịch vụ',
                 style: TextStyle(
-                  color: Color(0xFF2D4BFF),
+                  color: AppColors.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextSpan(text: ' và '),
-              TextSpan(
+              const TextSpan(text: ' và '),
+              const TextSpan(
                 text: 'Chính sách bảo mật',
                 style: TextStyle(
-                  color: Color(0xFF2D4BFF),
+                  color: AppColors.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -253,16 +261,16 @@ class _RegisterPageState extends State<RegisterPage> {
     onPressed: (_agreeToTerms && !_isLoading) ? _handleRegister : null,
   );
 
-  Widget _buildLoginLink() => Row(
+  Widget _buildLoginLink(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
-      const Text('Đã có tài khoản? '),
+      Text('Đã có tài khoản? ', style: TextStyle(color: AppColors.textPrimary(context))),
       GestureDetector(
         onTap: () => Navigator.pop(context),
         child: const Text(
           'Đăng nhập',
           style: TextStyle(
-            color: Color(0xFF2D4BFF),
+            color: AppColors.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -282,10 +290,11 @@ class _BackButton extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
+          color: AppColors.surface(context),
           shape: BoxShape.circle,
-          border: Border.all(color: const Color(0xFFE8E9EA)),
+          border: Border.all(color: AppColors.border(context)),
         ),
-        child: const Icon(Icons.chevron_left, color: Color(0xFF1A1D1E)),
+        child: Icon(Icons.chevron_left, color: AppColors.textPrimary(context)),
       ),
     );
   }
@@ -302,8 +311,8 @@ class _ToggleVisibilityIcon extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Icon(
-        obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-        color: Colors.grey,
+        obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+        color: AppColors.textSecondary(context),
       ),
     );
   }

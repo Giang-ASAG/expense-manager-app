@@ -368,4 +368,30 @@ class RTDBService {
           return values.map((v) => v / maxVal).toList();
         });
   }
+
+  Future<void> deleteWallet(String uid, String walletId) async {
+    final walletRef = _dbRef.child('wallets').child(uid).child(walletId);
+    final walletSnapshot = await walletRef.get();
+    if (!walletSnapshot.exists) return;
+
+    final isDefault = walletSnapshot.child('is_default').value == true;
+    await walletRef.remove();
+
+    if (isDefault) {
+      final remainingSnapshot = await _dbRef.child('wallets').child(uid).get();
+      if (remainingSnapshot.exists) {
+        final Map<dynamic, dynamic> remainingMap =
+            Map<dynamic, dynamic>.from(remainingSnapshot.value as Map);
+        if (remainingMap.isNotEmpty) {
+          final firstKey = remainingMap.keys.first.toString();
+          await _dbRef
+              .child('wallets')
+              .child(uid)
+              .child(firstKey)
+              .child('is_default')
+              .set(true);
+        }
+      }
+    }
+  }
 }

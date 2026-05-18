@@ -14,16 +14,16 @@ class OverviewAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       elevation: 0,
       scrolledUnderElevation: 0,
       titleSpacing: 20,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(_greeting(), style: AppTextStyles.labelMuted),
+          Text(_greeting(), style: AppTextStyles.labelMuted(context)),
           const SizedBox(height: 2),
-          const Text('Tổng quan', style: AppTextStyles.pageTitle),
+          Text('Tổng quan', style: AppTextStyles.pageTitle(context)),
         ],
       ),
       actions: [
@@ -57,13 +57,13 @@ class _NotificationBell extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: AppColors.border(context)),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.notifications_none_rounded,
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimary(context),
             size: 20,
           ),
         ),
@@ -106,7 +106,7 @@ class _UserAvatar extends StatelessWidget {
             : null,
       ),
       child: photoUrl == null
-          ? const Icon(Icons.person, color: AppColors.primary, size: 20)
+          ? Icon(Icons.person, color: AppColors.primary, size: 20)
           : null,
     );
   }

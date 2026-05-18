@@ -1,3 +1,4 @@
+import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatelessWidget {
@@ -10,32 +11,34 @@ class PrimaryButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.backgroundColor = const Color(0xFF2D4BFF),
+    this.backgroundColor,
     this.textColor = Colors.white,
   });
 
   @override
   Widget build(BuildContext context) {
     final isEnabled = onPressed != null;
+    final effectiveBgColor = backgroundColor ?? AppColors.primary;
 
     return Container(
       width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: (isEnabled ? backgroundColor! : Colors.grey)
-                .withOpacity(0.25),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: isEnabled
+            ? [
+                BoxShadow(
+                  color: effectiveBgColor.withOpacity(0.25),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ]
+            : null,
       ),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isEnabled ? backgroundColor : Colors.grey.shade300,
-          foregroundColor: isEnabled ? textColor : Colors.grey.shade500,
+          backgroundColor: isEnabled ? effectiveBgColor : AppColors.border(context),
+          foregroundColor: isEnabled ? textColor : AppColors.textSecondary(context),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

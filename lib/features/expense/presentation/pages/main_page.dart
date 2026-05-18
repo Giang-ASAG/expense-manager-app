@@ -18,22 +18,46 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
-  // Dùng getter vì cần widget.user
-  List<Widget> get _pages => [
-    OverviewPage(user: widget.user),
-    // index 0
-    TransactionHistoryPage(id: widget.user!.uid),
-    // index 1
-    ExpenseGalleryPage(id: widget.user!.uid),
-    // index 2 - placeholder notifications
-    SettingsPage(user: widget.user),
-    // index 3 - placeholder settings
-  ];
+  // Lazy cache: null = chưa build, non-null = đã build và giữ lại
+  late final List<Widget?> _pageCache = List.filled(4, null);
+
+  /// Trả về widget của page, build lần đầu nếu chưa có
+  Widget _getPage(int index) {
+    if (_pageCache[index] != null) return _pageCache[index]!;
+
+    final Widget page;
+    switch (index) {
+      case 0:
+        page = OverviewPage(user: widget.user);
+      case 1:
+        page = TransactionHistoryPage(id: widget.user!.uid);
+      case 2:
+        page = ExpenseGalleryPage(id: widget.user!.uid);
+      case 3:
+        page = SettingsPage(user: widget.user);
+      default:
+        page = OverviewPage(user: widget.user);
+    }
+
+    _pageCache[index] = page;
+    return page;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      // Giữ state của các page đã từng mở bằng Offstage
+      body: Stack(
+        children: List.generate(4, (i) {
+          // Chỉ build page khi đã được truy cập ít nhất một lần
+          final isVisited = _pageCache[i] != null || i == _currentIndex;
+          if (!isVisited) return const SizedBox.shrink();
+          return Offstage(
+            offstage: _currentIndex != i,
+            child: _getPage(i),
+          );
+        }),
+      ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
@@ -46,6 +70,8 @@ class _MainPageState extends State<MainPage> {
           );
         },
       ),
+      // ✅ Fix: Đảm bảo body không bị che bởi nav bar
+      resizeToAvoidBottomInset: true,
     );
   }
 }

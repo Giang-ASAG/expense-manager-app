@@ -94,7 +94,7 @@ class _OverviewPageState extends ConsumerState<OverviewPage>
     final transactions = ref.watch(recentTransactionsProvider(_uid));
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       extendBody: true,
       appBar: OverviewAppBar(photoUrl: widget.user?.photoURL),
       body: FadeTransition(
@@ -170,9 +170,9 @@ class _ChartSkeleton extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       height: 160,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: const Center(child: CircularProgressIndicator()),
     );
@@ -193,7 +193,7 @@ class _TransactionSkeleton extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 12),
             height: 64,
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: AppColors.surface(context),
               borderRadius: BorderRadius.circular(16),
             ),
           ),
@@ -214,9 +214,9 @@ class _ErrorTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: Row(
         children: [
@@ -224,10 +224,10 @@ class _ErrorTile extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             message,
-            style: const TextStyle(color: AppColors.textSecondary),
+            style: TextStyle(color: AppColors.textSecondary(context)),
           ),
         ],
       ),
     );
   }
-}
+}

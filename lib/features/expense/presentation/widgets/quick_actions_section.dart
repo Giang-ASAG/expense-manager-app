@@ -23,7 +23,7 @@ class QuickActionsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Thao tác nhanh', style: AppTextStyles.sectionTitle),
+          Text('Thao tác nhanh', style: AppTextStyles.sectionTitle(context)),
           const SizedBox(height: 14),
           Row(
             children: [

@@ -1,3 +1,4 @@
+import 'package:expense_manager_app/core/style/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNav extends StatelessWidget {
@@ -12,8 +13,6 @@ class CustomBottomNav extends StatelessWidget {
     required this.onFabPressed,
   });
 
-  static const _primary = Color(0xFF2D4BFF);
-
   static const _items = [
     _NavItem(icon: Icons.home_rounded, label: 'Tổng quan'),
     _NavItem(icon: Icons.receipt_long_outlined, label: 'Lịch sử'),
@@ -23,75 +22,82 @@ class CustomBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.bottomCenter,
-        children: [
-          // ── Bar ───────────────────────────────────────────────────────────
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 72,
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.07),
-                    blurRadius: 20,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  // 2 icon bên trái
-                  ...[0, 1].map((i) => Expanded(child: _buildItem(i))),
-                  // Khoảng trống giữa cho FAB
-                  const SizedBox(width: 72),
-                  // 2 icon bên phải
-                  ...[2, 3].map((i) => Expanded(child: _buildItem(i))),
-                ],
-              ),
-            ),
-          ),
+    final systemNavHeight = MediaQuery.of(context).padding.bottom;
 
-          // ── FAB tròn ─────────────────────────────────────────────────────
-          Positioned(
-            top: 0,
-            child: GestureDetector(
-              onTap: onFabPressed,
+    return Container(
+      color: AppColors.background(context),
+      padding: EdgeInsets.only(bottom: systemNavHeight),
+      child: SizedBox(
+        height: 72,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.bottomCenter,
+          children: [
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
               child: Container(
-                width: 60,
-                height: 60,
+                height: 72,
                 decoration: BoxDecoration(
-                  color: _primary,
-                  shape: BoxShape.circle,
+                  color: AppColors.surface(context),
                   boxShadow: [
                     BoxShadow(
-                      color: _primary.withOpacity(0.4),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                      color: Colors.black.withOpacity(0.07),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.add_rounded,
-                  color: Colors.white,
-                  size: 32,
+                child: Row(
+                  children: [
+                    ...[
+                      0,
+                      1,
+                    ].map((i) => Expanded(child: _buildItem(context, i))),
+                    const SizedBox(width: 72),
+                    ...[
+                      2,
+                      3,
+                    ].map((i) => Expanded(child: _buildItem(context, i))),
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
+
+            Positioned(
+              top: -12,
+              child: GestureDetector(
+                onTap: onFabPressed,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.4),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.qr_code_scanner,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildItem(int index) {
+  Widget _buildItem(BuildContext context, int index) {
     final item = _items[index];
     final isSelected = currentIndex == index;
 
@@ -104,31 +110,32 @@ class CustomBottomNav extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Icon với pill background khi selected
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? _primary.withOpacity(0.12)
+                    ? AppColors.primary.withOpacity(0.12)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 item.icon,
                 size: 22,
-                color: isSelected ? _primary : const Color(0xFFBDBDBD),
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.textSecondary(context),
               ),
             ),
             const SizedBox(height: 2),
-            // Label
             Text(
               item.label,
               style: TextStyle(
                 fontSize: 10,
-                fontWeight:
-                isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? _primary : const Color(0xFFBDBDBD),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.textSecondary(context),
               ),
             ),
           ],

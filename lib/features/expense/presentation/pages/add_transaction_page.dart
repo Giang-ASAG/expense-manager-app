@@ -28,7 +28,9 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     _loadUid();
     // Set giá trị ban đầu từ param
     Future.microtask(() {
-      ref.read(addTransactionProvider.notifier).setExpenseType(widget.isExpense);
+      ref
+          .read(addTransactionProvider.notifier)
+          .setExpenseType(widget.isExpense);
     });
   }
 
@@ -69,11 +71,9 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
         ? ref.read(addTransactionProvider).selectedCategory
         : _nameController.text.trim();
 
-    final error = await ref.read(addTransactionProvider.notifier).save(
-      uid: _userId!,
-      name: name,
-      amount: amount,
-    );
+    final error = await ref
+        .read(addTransactionProvider.notifier)
+        .save(uid: _userId!, name: name, amount: amount);
 
     if (!mounted) return;
 
@@ -88,8 +88,13 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
   void _showSnackBar(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : null,
+        content: Text(
+          message,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: isError ? AppColors.danger : AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -99,18 +104,32 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     final state = ref.watch(addTransactionProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.background(context),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: AppColors.textPrimary),
-          onPressed: () => Navigator.pop(context),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.surface(context),
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.border(context)),
+              ),
+              child: Icon(
+                Icons.close,
+                color: AppColors.textPrimary(context),
+                size: 20,
+              ),
+            ),
+          ),
         ),
-        title: const Text(
+        title: Text(
           'Giao dịch mới',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimary(context),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -119,70 +138,82 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
       body: _userId == null
           ? const Center(child: CircularProgressIndicator())
           : Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  _buildTypeToggle(state),
-                  const SizedBox(height: 24),
-                  _buildInputGroup(),
-                  const SizedBox(height: 20),
-                  _buildWalletSelector(state),
-                  if (state.isExpense) ...[
-                    const SizedBox(height: 20),
-                    TransactionImagePicker(
-                      onImageChanged: (file) => ref
-                          .read(addTransactionProvider.notifier)
-                          .setImage(file),
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        _buildTypeToggle(state, context),
+                        const SizedBox(height: 24),
+                        _buildInputGroup(context),
+                        const SizedBox(height: 20),
+                        _buildWalletSelector(state, context),
+                        if (state.isExpense) ...[
+                          const SizedBox(height: 20),
+                          TransactionImagePicker(
+                            onImageChanged: (file) => ref
+                                .read(addTransactionProvider.notifier)
+                                .setImage(file),
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+                        _buildCategorySection(state, context),
+                        // ✅ Add spacing để tránh bị che bởi save button
+                        const SizedBox(height: 80),
+                      ],
                     ),
-                  ],
-                  const SizedBox(height: 24),
-                  _buildCategorySection(state),
-                ],
-              ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          _buildSaveButton(state),
-        ],
-      ),
+      bottomNavigationBar: SafeArea(top: false, child: _buildSaveButton(state, context)),
     );
   }
 
-  Widget _buildTypeToggle(AddTransactionState state) {
+  Widget _buildTypeToggle(AddTransactionState state, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.border.withOpacity(0.5),
+        color: AppColors.border(context).withOpacity(0.4),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          _toggleItem('Chi phí', state.isExpense, AppColors.danger),
-          _toggleItem('Thu nhập', !state.isExpense, AppColors.success),
+          _toggleItem('Chi phí', state.isExpense, AppColors.danger, context),
+          _toggleItem('Thu nhập', !state.isExpense, AppColors.success, context),
         ],
       ),
     );
   }
 
-  Widget _toggleItem(String label, bool isActive, Color activeColor) {
+  Widget _toggleItem(String label, bool isActive, Color activeColor, BuildContext context) {
     return Expanded(
       child: GestureDetector(
         onTap: () => ref
             .read(addTransactionProvider.notifier)
             .setExpenseType(label == 'Chi phí'),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             color: isActive ? activeColor : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: activeColor.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : [],
           ),
           child: Center(
             child: Text(
               label,
               style: TextStyle(
-                color: isActive ? Colors.white : AppColors.textSecondary,
+                color: isActive ? Colors.white : AppColors.textSecondary(context),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -192,55 +223,76 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     );
   }
 
-  Widget _buildInputGroup() {
+  Widget _buildInputGroup(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.border(context)),
       ),
       child: Column(
         children: [
-          _buildTextField(Icons.description_outlined, 'Tên giao dịch',
-              controller: _nameController),
-          const Divider(height: 1, color: AppColors.border),
-          _buildTextField(Icons.attach_money, 'Số tiền',
-              isNumber: true, controller: _amountController),
-          const Divider(height: 1, color: AppColors.border),
-          _buildTextField(Icons.calendar_today_outlined, '24/03/2026',
-              isReadOnly: true),
+          _buildTextField(
+            Icons.description_outlined,
+            'Tên giao dịch',
+            controller: _nameController,
+            context: context,
+          ),
+          Divider(height: 1, color: AppColors.border(context)),
+          _buildTextField(
+            Icons.attach_money,
+            'Số tiền',
+            isNumber: true,
+            controller: _amountController,
+            context: context,
+          ),
+          Divider(height: 1, color: AppColors.border(context)),
+          _buildTextField(
+            Icons.calendar_today_outlined,
+            '24/03/2026',
+            isReadOnly: true,
+            context: context,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildTextField(
-      IconData icon,
-      String hint, {
-        bool isNumber = false,
-        bool isReadOnly = false,
-        TextEditingController? controller,
-      }) {
+    IconData icon,
+    String hint, {
+    required BuildContext context,
+    bool isNumber = false,
+    bool isReadOnly = false,
+    TextEditingController? controller,
+  }) {
     return TextField(
       controller: controller,
       readOnly: isReadOnly,
       keyboardType: isNumber
           ? const TextInputType.numberWithOptions(decimal: true)
           : TextInputType.text,
-      style: const TextStyle(
-          fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: AppColors.textPrimary(context),
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle:
-        const TextStyle(color: AppColors.textSecondary, fontSize: 15),
-        prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 22),
+        hintStyle: TextStyle(
+          color: AppColors.textSecondary(context),
+          fontSize: 15,
+        ),
+        prefixIcon: Icon(icon, color: AppColors.textSecondary(context), size: 22),
         border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        filled: false,
       ),
     );
   }
 
-  Widget _buildWalletSelector(AddTransactionState state) {
+  Widget _buildWalletSelector(AddTransactionState state, BuildContext context) {
     return StreamBuilder<List<WalletModel>>(
       stream: RTDBService().getWalletsStream(_userId!),
       builder: (context, snapshot) {
@@ -252,35 +304,43 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
 
         // Set ví mặc định nếu chưa có
         if (state.selectedWalletId == null) {
-          Future.microtask(() => ref
-              .read(addTransactionProvider.notifier)
-              .setWallet(wallets.first.id));
+          Future.microtask(
+            () => ref
+                .read(addTransactionProvider.notifier)
+                .setWallet(wallets.first.id),
+          );
         }
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: AppColors.surface(context),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: AppColors.border(context)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: state.selectedWalletId ?? wallets.first.id,
               isExpanded: true,
-              icon: const Icon(Icons.keyboard_arrow_down,
-                  color: AppColors.textSecondary),
+              dropdownColor: AppColors.surface(context),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                color: AppColors.textSecondary(context),
+              ),
               items: wallets.map((wallet) {
                 return DropdownMenuItem<String>(
                   value: wallet.id,
                   child: Row(
                     children: [
-                      const Icon(Icons.account_balance_wallet_outlined,
-                          color: AppColors.textSecondary),
+                      Icon(
+                        Icons.account_balance_wallet_outlined,
+                        color: AppColors.textSecondary(context),
+                      ),
                       const SizedBox(width: 12),
-                      Text('${wallet.bankName} (${wallet.balance})',
-                          style:
-                          const TextStyle(color: AppColors.textPrimary)),
+                      Text(
+                        '${wallet.bankName} (${wallet.balance})',
+                        style: TextStyle(color: AppColors.textPrimary(context)),
+                      ),
                     ],
                   ),
                 );
@@ -297,11 +357,11 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     );
   }
 
-  Widget _buildCategorySection(AddTransactionState state) {
+  Widget _buildCategorySection(AddTransactionState state, BuildContext context) {
     return StreamBuilder<List<CategoryModel>>(
       stream: RTDBService().getCategoriesStream(_userId!, state.isExpense),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const CircularProgressIndicator();
+        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
         final categories = snapshot.data!;
         return GridView.builder(
           shrinkWrap: true,
@@ -313,31 +373,45 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
             mainAxisSpacing: 12,
           ),
           itemCount: categories.length,
-          itemBuilder: (context, index) {
+          itemBuilder: (ctx, index) {
             final category = categories[index];
             final isSelected = state.selectedCategory == category.name;
             return GestureDetector(
               onTap: () => ref
                   .read(addTransactionProvider.notifier)
                   .setCategory(category.name),
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
                 decoration: BoxDecoration(
-                  color: isSelected ? category.color : AppColors.surface,
+                  color: isSelected ? category.color : AppColors.surface(context),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isSelected ? Colors.transparent : AppColors.border,
+                    color: isSelected ? Colors.transparent : AppColors.border(context),
                   ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: category.color.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ]
+                      : [],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(category.iconData,
-                        color: isSelected ? Colors.white : category.color),
+                    Icon(
+                      category.iconData,
+                      color: isSelected ? Colors.white : category.color,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       category.name,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.textPrimary(context),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -351,10 +425,13 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     );
   }
 
-  Widget _buildSaveButton(AddTransactionState state) {
+  Widget _buildSaveButton(AddTransactionState state, BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      color: AppColors.surface,
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface(context),
+        border: Border(top: BorderSide(color: AppColors.border(context))),
+      ),
       child: SizedBox(
         width: double.infinity,
         height: 56,
@@ -363,17 +440,20 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
           ),
           child: state.isSaving
               ? const CircularProgressIndicator(color: Colors.white)
               : const Text(
-            'Lưu',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
-          ),
+                  'Lưu giao dịch',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
       ),
     );
